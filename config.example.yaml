@@ -1,0 +1,37 @@
+# Copie para config.yaml e preencha.
+# Comece com dry_run: true -> o sistema só simula e mostra o que faria.
+dry_run: true
+graph_version: v23.0
+test_status: PAUSED     # PAUSED = cria os testes pausados pra você revisar; ACTIVE = já liga
+data_dir: data
+
+# Contas de anúncio do seu Business Manager
+accounts:
+  conta1:
+    ad_account_id: "1234567890"        # sem o "act_"
+    page_id: "111111111111111"
+    template_adset_id: "2385000000000"  # conjunto modelo (público, orçamento, pixel, posicionamento)
+    instagram_user_id: ""               # opcional
+  # conta2:
+  #   ad_account_id: "..."
+  #   page_id: "..."
+  #   template_adset_id: "..."
+
+# Produtos/ofertas. No grupo, mande o vídeo com legenda "#chave descrição".
+products:
+  produtox:
+    link: https://seusite.com/produtox
+    message: "Texto principal do anúncio"
+    headline: "Título do anúncio"
+    cta: SHOP_NOW          # LEARN_MORE, SHOP_NOW, SIGN_UP, BUY_NOW...
+    accounts: [conta1]     # vazio = sobe em todas as contas
+default_product: produtox
+
+rules:
+  target_cpa: 50.0            # CPA alvo em R$
+  kill_spend_multiplier: 1.5  # pausa se gastou 1,5x o CPA alvo sem venda
+  kill_cpa_multiplier: 2.0    # pausa se CPA passou de 2x o alvo
+  scale_min_conversions: 2    # mínimo de vendas no dia para escalar
+  scale_pct: 20               # +20% de orçamento (no máximo 1x por dia)
+  max_daily_budget: 1000.0    # teto de orçamento diário por conjunto (R$)
+  conversion_action: offsite_conversion.fb_pixel_purchase
