@@ -34,13 +34,13 @@ class Account:
 
 @dataclass
 class Rules:
-    # Resultado que conta (padrão: conversa iniciada no WhatsApp)
-    result_action: str = "onsite_conversion.messaging_conversation_started_7d"
-    target_cost: float = 1.41  # custo por resultado para o criativo validar
-    validate_min_results: int = 10  # resultados mínimos para considerar validado
-    kill_spend_no_result: float = 10.0  # pausa se gastou isso sem nenhum resultado
-    kill_min_spend: float = 10.0  # só julga o custo depois de gastar isso
-    kill_cost_multiplier: float = 1.5  # pausa se custo por resultado > X vezes o alvo
+    # Resultado que conta (padrão: compra)
+    result_action: str = "purchase"
+    target_cost: float = 5.0  # custo por compra para o criativo validar
+    max_cost: float = 6.0  # acima disso não compensa: pausa
+    validate_min_results: int = 3  # compras mínimas para considerar validado
+    kill_spend_no_result: float = 10.0  # pausa se gastou isso sem nenhuma compra
+    kill_min_spend: float = 12.0  # só julga o custo depois de gastar isso
     pause_others_on_validate: bool = True  # quando um valida, pausa os que não validaram
 
 

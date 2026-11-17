@@ -1,5 +1,5 @@
 """Regras automáticas no seu método: dentro de cada campanha de teste (bid cap),
-o criativo que valida fica ativo e os que não validaram são pausados.
+o criativo que valida pelo custo por compra fica ativo e os que não validaram são pausados.
 
 Só mexe nas campanhas criadas pelo próprio sistema (tabela uploads),
 nunca nas suas campanhas manuais.
@@ -42,15 +42,15 @@ def decide_campaign(ads: list[AdStat], rules: Rules) -> list[tuple[AdStat, str, 
     """Retorna [(anúncio, 'pause' | 'validate', motivo)] para uma campanha de teste."""
     active = [a for a in ads if a.active]
     validated = [a for a in active if is_validated(a, rules)]
-    out = [(a, "validate", f"{a.results:.0f} resultados a R${a.cost:.2f}") for a in validated]
+    out = [(a, "validate", f"{a.results:.0f} compras a R${a.cost:.2f}") for a in validated]
 
     for a in active:
         if a in validated:
             continue
         if a.results == 0 and a.spend >= rules.kill_spend_no_result:
-            out.append((a, "pause", f"gastou R${a.spend:.2f} sem resultado"))
-        elif a.cost and a.spend >= rules.kill_min_spend and a.cost > rules.target_cost * rules.kill_cost_multiplier:
-            out.append((a, "pause", f"custo R${a.cost:.2f} por resultado"))
+            out.append((a, "pause", f"gastou R${a.spend:.2f} sem compra"))
+        elif a.cost and a.spend >= rules.kill_min_spend and a.cost > rules.max_cost:
+            out.append((a, "pause", f"custo R${a.cost:.2f} por compra"))
         elif validated and rules.pause_others_on_validate:
             out.append((a, "pause", "outro criativo validou na campanha"))
     return out

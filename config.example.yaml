@@ -30,11 +30,12 @@ default_product: dorama
 
 # Regras do seu método: o criativo que valida fica, os outros são pausados.
 # Valores em R$, contando desde que a campanha de teste foi criada.
+# Conta: oferta de R$9,90 -> custo por compra precisa ficar perto de R$5 pra compensar.
 rules:
-  result_action: onsite_conversion.messaging_conversation_started_7d  # conversa iniciada
-  target_cost: 1.41             # custo por conversa para validar
-  validate_min_results: 10      # conversas mínimas para considerar validado
-  kill_spend_no_result: 10.0    # pausa se gastou isso sem nenhuma conversa
-  kill_min_spend: 10.0          # só julga o custo depois de gastar isso
-  kill_cost_multiplier: 1.5     # pausa se custo por conversa > 1,5x o alvo
+  result_action: purchase       # evento de compra que aparece no seu gerenciador
+  target_cost: 5.0              # custo por compra para validar
+  max_cost: 6.0                 # acima disso não compensa: pausa
+  validate_min_results: 3       # compras mínimas para considerar validado
+  kill_spend_no_result: 10.0    # pausa se gastou isso sem nenhuma compra
+  kill_min_spend: 12.0          # só julga o custo depois de gastar isso
   pause_others_on_validate: true  # quando um valida, pausa os que não validaram

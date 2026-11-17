@@ -21,7 +21,10 @@ Grupo Telegram ──► collect ──► upload ──► Meta Ads (cópia da 
 2. **Token da Meta:** no Business Manager → Configurações → Usuários do sistema, crie um usuário
    do sistema e dê acesso às contas de anúncio e páginas. Gere um token com `ads_management`,
    `ads_read` e `pages_read_engagement`.
-3. **Campanha modelo:** em cada conta, crie uma campanha pausada do jeito que você testa hoje
+3. **Rastreio de compra:** o sistema decide pelo custo por compra que aparece no seu gerenciador.
+   O evento de compra precisa estar chegando na Meta (Pixel ou API de Conversões disparando quando o
+   pagamento é confirmado). Se no gerenciador a coluna de compras está preenchida, já está certo.
+4. **Campanha modelo:** em cada conta, crie uma campanha pausada do jeito que você testa hoje
    (bid cap, orçamento de R$100, destino WhatsApp) com **um conjunto e nenhum anúncio**.
    Cada lote de criativos vira uma cópia dela. Copie o ID da campanha.
 
@@ -58,9 +61,10 @@ Os números contam desde que a campanha de teste foi criada.
 
 | Situação | Ação |
 |---|---|
-| Pelo menos `validate_min_results` conversas a no máximo `target_cost` cada | 🏆 Validou: fica ativo e você é avisado |
-| Gastou `kill_spend_no_result` sem nenhuma conversa | Pausa |
-| Já gastou `kill_min_spend` e o custo por conversa passou de `kill_cost_multiplier` × alvo | Pausa |
+| Pelo menos `validate_min_results` compras a no máximo `target_cost` cada (padrão: 3 compras a até R$5) | 🏆 Validou: fica ativo e você é avisado |
+| Custo por compra entre `target_cost` e `max_cost` (R$5 a R$6) | Continua rodando |
+| Gastou `kill_spend_no_result` sem nenhuma compra (padrão: R$10) | Pausa |
+| Já gastou `kill_min_spend` e o custo por compra passou de `max_cost` (padrão: R$6) | Pausa |
 | Outro criativo da mesma campanha validou (`pause_others_on_validate`) | Pausa |
 
 ## Limitações atuais
