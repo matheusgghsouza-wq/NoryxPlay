@@ -2,7 +2,8 @@
 # Comece com dry_run: true -> o sistema só simula e mostra o que faria.
 dry_run: true
 graph_version: v23.0
-test_status: PAUSED     # PAUSED = cria os testes pausados pra você revisar; ACTIVE = já liga
+test_status: PAUSED     # PAUSED = cria a campanha de teste pausada pra você revisar; ACTIVE = já liga
+max_ads_per_campaign: 5 # quantos criativos entram em cada campanha de teste
 data_dir: data
 
 # Contas de anúncio do seu Business Manager
@@ -10,28 +11,30 @@ accounts:
   conta1:
     ad_account_id: "1234567890"        # sem o "act_"
     page_id: "111111111111111"
-    template_adset_id: "2385000000000"  # conjunto modelo (público, orçamento, pixel, posicionamento)
+    template_campaign_id: "2385000000000"  # campanha modelo: bid cap, R$100/dia, 1 conjunto, sem anúncios
     instagram_user_id: ""               # opcional
   # conta2:
   #   ad_account_id: "..."
   #   page_id: "..."
-  #   template_adset_id: "..."
+  #   template_campaign_id: "..."
 
 # Produtos/ofertas. No grupo, mande o vídeo com legenda "#chave descrição".
 products:
-  produtox:
-    link: https://seusite.com/produtox
+  dorama:
     message: "Texto principal do anúncio"
-    headline: "Título do anúncio"
-    cta: SHOP_NOW          # LEARN_MORE, SHOP_NOW, SIGN_UP, BUY_NOW...
-    accounts: [conta1]     # vazio = sobe em todas as contas
-default_product: produtox
+    headline: ""             # opcional
+    cta: WHATSAPP_MESSAGE    # anúncio de clique para WhatsApp
+    # link: https://...      # só se usar outro CTA (LEARN_MORE, SIGN_UP...)
+    accounts: [conta1]       # vazio = sobe em todas as contas
+default_product: dorama
 
+# Regras do seu método: o criativo que valida fica, os outros são pausados.
+# Valores em R$, contando desde que a campanha de teste foi criada.
 rules:
-  target_cpa: 50.0            # CPA alvo em R$
-  kill_spend_multiplier: 1.5  # pausa se gastou 1,5x o CPA alvo sem venda
-  kill_cpa_multiplier: 2.0    # pausa se CPA passou de 2x o alvo
-  scale_min_conversions: 2    # mínimo de vendas no dia para escalar
-  scale_pct: 20               # +20% de orçamento (no máximo 1x por dia)
-  max_daily_budget: 1000.0    # teto de orçamento diário por conjunto (R$)
-  conversion_action: offsite_conversion.fb_pixel_purchase
+  result_action: onsite_conversion.messaging_conversation_started_7d  # conversa iniciada
+  target_cost: 1.41             # custo por conversa para validar
+  validate_min_results: 10      # conversas mínimas para considerar validado
+  kill_spend_no_result: 10.0    # pausa se gastou isso sem nenhuma conversa
+  kill_min_spend: 10.0          # só julga o custo depois de gastar isso
+  kill_cost_multiplier: 1.5     # pausa se custo por conversa > 1,5x o alvo
+  pause_others_on_validate: true  # quando um valida, pausa os que não validaram

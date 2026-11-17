@@ -1,6 +1,7 @@
-"""Regras automáticas: pausa testes ruins e escala os que batem a meta de CPA.
+"""Regras automáticas no seu método: dentro de cada campanha de teste (bid cap),
+o criativo que valida fica ativo e os que não validaram são pausados.
 
-Só mexe nos conjuntos criados pelo próprio sistema (tabela uploads),
+Só mexe nas campanhas criadas pelo próprio sistema (tabela uploads),
 nunca nas suas campanhas manuais.
 """
 from __future__ import annotations
@@ -17,70 +18,71 @@ log = logging.getLogger(__name__)
 
 
 @dataclass
-class Decision:
-    action: str  # pause | scale | keep
-    reason: str
-    new_budget_cents: int | None = None
+class AdStat:
+    ad_id: str
+    name: str
+    spend: float
+    results: float
+    active: bool
+
+    @property
+    def cost(self) -> float | None:
+        return self.spend / self.results if self.results else None
 
 
-def conversions(row: dict, action_type: str) -> float:
+def results(row: dict, action_type: str) -> float:
     return sum(float(a.get("value", 0)) for a in row.get("actions", []) if a.get("action_type") == action_type)
 
 
-def decide(spend: float, convs: float, budget_cents: int | None, rules: Rules, scaled_today: bool) -> Decision:
-    target = rules.target_cpa
-    if convs == 0:
-        if spend >= target * rules.kill_spend_multiplier:
-            return Decision("pause", f"gastou R${spend:.2f} sem conversão")
-        return Decision("keep", "aprendendo")
+def is_validated(ad: AdStat, rules: Rules) -> bool:
+    return ad.results >= rules.validate_min_results and ad.cost is not None and ad.cost <= rules.target_cost
 
-    cpa = spend / convs
-    if cpa > target * rules.kill_cpa_multiplier:
-        return Decision("pause", f"CPA R${cpa:.2f} acima do limite")
-    if cpa <= target and convs >= rules.scale_min_conversions and not scaled_today and budget_cents:
-        new = int(budget_cents * (1 + rules.scale_pct / 100))
-        new = min(new, int(rules.max_daily_budget * 100))
-        if new > budget_cents:
-            return Decision("scale", f"CPA R${cpa:.2f} com {convs:.0f} conversões", new)
-    return Decision("keep", f"CPA R${cpa:.2f}")
+
+def decide_campaign(ads: list[AdStat], rules: Rules) -> list[tuple[AdStat, str, str]]:
+    """Retorna [(anúncio, 'pause' | 'validate', motivo)] para uma campanha de teste."""
+    active = [a for a in ads if a.active]
+    validated = [a for a in active if is_validated(a, rules)]
+    out = [(a, "validate", f"{a.results:.0f} resultados a R${a.cost:.2f}") for a in validated]
+
+    for a in active:
+        if a in validated:
+            continue
+        if a.results == 0 and a.spend >= rules.kill_spend_no_result:
+            out.append((a, "pause", f"gastou R${a.spend:.2f} sem resultado"))
+        elif a.cost and a.spend >= rules.kill_min_spend and a.cost > rules.target_cost * rules.kill_cost_multiplier:
+            out.append((a, "pause", f"custo R${a.cost:.2f} por resultado"))
+        elif validated and rules.pause_others_on_validate:
+            out.append((a, "pause", "outro criativo validou na campanha"))
+    return out
 
 
 def run(conn: sqlite3.Connection, settings: Settings, meta: Meta) -> list[str]:
     today = date.today().isoformat()
-    managed = {r["adset_id"]: r["account_key"] for r in
-               conn.execute("SELECT adset_id, account_key FROM uploads WHERE status = 'done' AND adset_id IS NOT NULL")}
-    if not managed:
-        return []
+    campaigns = [r["campaign_id"] for r in conn.execute(
+        "SELECT DISTINCT campaign_id FROM uploads WHERE status = 'done' AND campaign_id IS NOT NULL")]
 
     report = []
-    for acc_key in sorted(set(managed.values())):
-        acc = settings.accounts.get(acc_key)
-        if not acc:
-            continue
-        for row in meta.adsets_insights(acc.ad_account_id, "today"):
-            adset_id = row["adset_id"]
-            if adset_id not in managed:
-                continue
-            info = meta.adset_info(adset_id)
-            if info.get("effective_status") != "ACTIVE":
-                continue
-            scaled_today = conn.execute(
-                "SELECT 1 FROM actions WHERE adset_id = ? AND action = 'scale' AND day = ?", (adset_id, today)
-            ).fetchone() is not None
-            budget = int(info["daily_budget"]) if info.get("daily_budget") else None
-            d = decide(float(row.get("spend", 0)), conversions(row, settings.rules.conversion_action),
-                       budget, settings.rules, scaled_today)
+    for campaign_id in campaigns:
+        statuses = {a["id"]: a for a in meta.campaign_ads(campaign_id)}
+        ads = []
+        for row in meta.ads_insights(campaign_id):
+            info = statuses.get(row["ad_id"], {})
+            ads.append(AdStat(row["ad_id"], row.get("ad_name", ""), float(row.get("spend", 0)),
+                              results(row, settings.rules.result_action),
+                              info.get("effective_status") == "ACTIVE"))
 
-            if d.action == "pause":
-                meta.pause(adset_id)
-                report.append(f"⏸️ {row['adset_name']}: {d.reason}")
-            elif d.action == "scale":
-                meta.set_daily_budget(adset_id, d.new_budget_cents)
-                report.append(f"🚀 {row['adset_name']}: {d.reason} → R${d.new_budget_cents / 100:.2f}/dia")
+        for ad, action, reason in decide_campaign(ads, settings.rules):
+            if action == "validate":
+                # avisa só uma vez por anúncio
+                if conn.execute("SELECT 1 FROM actions WHERE object_id = ? AND action = 'validate'",
+                                (ad.ad_id,)).fetchone():
+                    continue
+                report.append(f"🏆 VALIDOU: {ad.name} ({reason})")
             else:
-                continue
+                meta.pause(ad.ad_id)
+                report.append(f"⏸️ {ad.name}: {reason}")
             if not meta.dry_run:
-                conn.execute("INSERT INTO actions (adset_id, action, detail, day) VALUES (?, ?, ?, ?)",
-                             (adset_id, d.action, d.reason, today))
+                conn.execute("INSERT INTO actions (object_id, action, detail, day) VALUES (?, ?, ?, ?)",
+                             (ad.ad_id, action, reason, today))
                 conn.commit()
     return report

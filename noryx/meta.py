@@ -86,51 +86,49 @@ class Meta:
     def create_video_creative(self, ad_account_id: str, name: str, page_id: str, video_id: str,
                               thumb_url: str, message: str, headline: str, link: str, cta: str,
                               instagram_user_id: str = "") -> str:
-        story = {
-            "page_id": page_id,
-            "video_data": {
-                "video_id": video_id,
-                "image_url": thumb_url,
-                "message": message,
-                "title": headline,
-                "call_to_action": {"type": cta, "value": {"link": link}},
-            },
+        if cta == "WHATSAPP_MESSAGE":
+            cta_value = {"app_destination": "WHATSAPP"}
+        else:
+            cta_value = {"link": link}
+        video_data = {
+            "video_id": video_id,
+            "image_url": thumb_url,
+            "message": message,
+            "call_to_action": {"type": cta, "value": cta_value},
         }
+        if headline:
+            video_data["title"] = headline
+        story = {"page_id": page_id, "video_data": video_data}
         if instagram_user_id:
             story["instagram_user_id"] = instagram_user_id
         return self.post(f"act_{ad_account_id}/adcreatives", name=name, object_story_spec=story)["id"]
 
     # ---------- estrutura de teste ----------
-    def copy_adset(self, template_adset_id: str, new_name: str, status: str) -> str:
-        res = self.post(f"{template_adset_id}/copies", deep_copy="false", status_option=status,
+    def copy_campaign(self, template_campaign_id: str, new_name: str, status: str) -> tuple[str, str]:
+        """Copia a campanha modelo (com bid cap, orçamento e conjunto). Retorna (campanha, conjunto)."""
+        res = self.post(f"{template_campaign_id}/copies", deep_copy="true", status_option=status,
                         rename_options={"rename_strategy": "NO_RENAME"})
-        adset_id = res.get("copied_adset_id") or res["id"]
-        self.post(adset_id, name=new_name)
-        return adset_id
+        campaign_id = res.get("copied_campaign_id") or res["id"]
+        self.post(campaign_id, name=new_name)
+        if self.dry_run:
+            return campaign_id, f"{campaign_id}_adset"
+        adsets = self.get(f"{campaign_id}/adsets", fields="id").get("data", [])
+        if not adsets:
+            raise MetaError("A campanha modelo precisa ter um conjunto de anúncios")
+        return campaign_id, adsets[0]["id"]
 
     def create_ad(self, ad_account_id: str, name: str, adset_id: str, creative_id: str, status: str) -> str:
         return self.post(f"act_{ad_account_id}/ads", name=name, adset_id=adset_id,
                          creative={"creative_id": creative_id}, status=status)["id"]
 
     # ---------- leitura e ajustes ----------
-    def adsets_insights(self, ad_account_id: str, date_preset: str = "today") -> list[dict]:
-        rows, after = [], None
-        while True:
-            params = dict(level="adset", date_preset=date_preset, limit=500,
-                          fields="adset_id,adset_name,spend,actions,action_values")
-            if after:
-                params["after"] = after
-            data = self.get(f"act_{ad_account_id}/insights", **params)
-            rows.extend(data.get("data", []))
-            after = data.get("paging", {}).get("cursors", {}).get("after")
-            if not data.get("paging", {}).get("next"):
-                return rows
+    def campaign_ads(self, campaign_id: str) -> list[dict]:
+        return self.get(f"{campaign_id}/ads", fields="id,name,effective_status", limit=200).get("data", [])
 
-    def adset_info(self, adset_id: str) -> dict:
-        return self.get(adset_id, fields="name,status,effective_status,daily_budget")
+    def ads_insights(self, campaign_id: str) -> list[dict]:
+        """Métricas acumuladas de cada anúncio da campanha desde que ela foi criada."""
+        return self.get(f"{campaign_id}/insights", level="ad", date_preset="maximum", limit=200,
+                        fields="ad_id,ad_name,spend,actions").get("data", [])
 
     def pause(self, object_id: str) -> None:
         self.post(object_id, status="PAUSED")
-
-    def set_daily_budget(self, adset_id: str, budget_cents: int) -> None:
-        self.post(adset_id, daily_budget=str(budget_cents))

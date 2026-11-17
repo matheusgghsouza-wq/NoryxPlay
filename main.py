@@ -3,7 +3,7 @@
 Uso:
   python main.py collect   # baixa vídeos novos do grupo do Telegram
   python main.py upload    # sobe criativos pendentes e cria os testes
-  python main.py rules     # aplica as regras de pausa/escala
+  python main.py rules     # valida o criativo bom e pausa os outros
   python main.py retry     # libera para nova tentativa os uploads que deram erro
   python main.py run       # loop contínuo com tudo acima
 """

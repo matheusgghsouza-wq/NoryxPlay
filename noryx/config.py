@@ -14,10 +14,10 @@ class Product:
     """Um produto/oferta. O criativo enviado no grupo com '#chave' usa estes dados."""
 
     key: str
-    link: str
     message: str
+    link: str = ""  # opcional quando o CTA é WHATSAPP_MESSAGE
     headline: str = ""
-    cta: str = "LEARN_MORE"
+    cta: str = "WHATSAPP_MESSAGE"
     accounts: list[str] = field(default_factory=list)  # chaves de contas; vazio = todas
 
 
@@ -28,20 +28,20 @@ class Account:
     key: str
     ad_account_id: str  # sem o prefixo act_
     page_id: str
-    template_adset_id: str  # conjunto modelo copiado para cada criativo de teste
+    template_campaign_id: str  # campanha modelo (bid cap + orçamento) copiada a cada lote de teste
     instagram_user_id: str = ""
 
 
 @dataclass
 class Rules:
-    metric: str = "cpa"
-    target_cpa: float = 50.0
-    kill_spend_multiplier: float = 1.5  # pausa se gastou X vezes o CPA alvo sem venda
-    kill_cpa_multiplier: float = 2.0  # pausa se CPA > X vezes o alvo
-    scale_min_conversions: int = 2
-    scale_pct: float = 20.0  # aumento de orçamento por vez
-    max_daily_budget: float = 1000.0
-    conversion_action: str = "offsite_conversion.fb_pixel_purchase"
+    # Resultado que conta (padrão: conversa iniciada no WhatsApp)
+    result_action: str = "onsite_conversion.messaging_conversation_started_7d"
+    target_cost: float = 1.41  # custo por resultado para o criativo validar
+    validate_min_results: int = 10  # resultados mínimos para considerar validado
+    kill_spend_no_result: float = 10.0  # pausa se gastou isso sem nenhum resultado
+    kill_min_spend: float = 10.0  # só julga o custo depois de gastar isso
+    kill_cost_multiplier: float = 1.5  # pausa se custo por resultado > X vezes o alvo
+    pause_others_on_validate: bool = True  # quando um valida, pausa os que não validaram
 
 
 @dataclass
@@ -57,6 +57,7 @@ class Settings:
     default_product: str
     rules: Rules
     test_status: str  # ACTIVE ou PAUSED ao criar os testes
+    max_ads_per_campaign: int
 
 
 def load(path: str | Path = "config.yaml") -> Settings:
@@ -86,4 +87,5 @@ def load(path: str | Path = "config.yaml") -> Settings:
         default_product=default_product,
         rules=Rules(**raw.get("rules", {})),
         test_status=raw.get("test_status", "PAUSED").upper(),
+        max_ads_per_campaign=int(raw.get("max_ads_per_campaign", 5)),
     )

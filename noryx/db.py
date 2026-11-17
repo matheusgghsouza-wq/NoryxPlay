@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS uploads (
     account_key TEXT NOT NULL,
     video_id TEXT,
     creative_meta_id TEXT,
+    campaign_id TEXT,
     adset_id TEXT,
     ad_id TEXT,
     status TEXT NOT NULL DEFAULT 'pending',  -- pending | done | error
@@ -30,8 +31,8 @@ CREATE TABLE IF NOT EXISTS uploads (
 );
 CREATE TABLE IF NOT EXISTS actions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    adset_id TEXT NOT NULL,
-    action TEXT NOT NULL,  -- pause | scale
+    object_id TEXT NOT NULL,  -- id do anúncio
+    action TEXT NOT NULL,  -- pause | validate
     detail TEXT,
     day TEXT NOT NULL,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP

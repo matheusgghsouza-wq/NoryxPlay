@@ -1,38 +1,50 @@
 from noryx.config import Rules
-from noryx.rules import conversions, decide
+from noryx.rules import AdStat, decide_campaign, results
 from noryx.telegram import parse_caption
+from noryx.uploader import chunks
 
-R = Rules(target_cpa=50, kill_spend_multiplier=1.5, kill_cpa_multiplier=2.0,
-          scale_min_conversions=2, scale_pct=20, max_daily_budget=100)
-
-
-def test_keeps_learning_without_spend():
-    assert decide(20, 0, 5000, R, False).action == "keep"
+R = Rules(target_cost=1.41, validate_min_results=10, kill_spend_no_result=10,
+          kill_min_spend=10, kill_cost_multiplier=1.5, pause_others_on_validate=True)
 
 
-def test_pauses_spend_without_conversion():
-    assert decide(75, 0, 5000, R, False).action == "pause"
+def ad(i, spend, res, active=True):
+    return AdStat(str(i), f"ad{i}", spend, res, active)
 
 
-def test_pauses_expensive_cpa():
-    assert decide(220, 2, 5000, R, False).action == "pause"
+def actions(ads, rules=R):
+    return {a.ad_id: act for a, act, _ in decide_campaign(ads, rules)}
 
 
-def test_scales_good_cpa_once_per_day():
-    d = decide(80, 2, 5000, R, False)
-    assert d.action == "scale" and d.new_budget_cents == 6000
-    assert decide(80, 2, 5000, R, True).action == "keep"
+def test_nothing_happens_while_learning():
+    assert actions([ad(1, 3, 1), ad(2, 2, 0)]) == {}
 
 
-def test_scale_respects_budget_cap():
-    assert decide(80, 2, 9000, R, False).new_budget_cents == 10000
-    assert decide(80, 2, 10000, R, False).action == "keep"
+def test_pauses_spend_without_result():
+    assert actions([ad(1, 12, 0)]) == {"1": "pause"}
 
 
-def test_conversions_sum():
-    row = {"actions": [{"action_type": "offsite_conversion.fb_pixel_purchase", "value": "3"},
+def test_pauses_expensive_cost():
+    assert actions([ad(1, 30, 10)]) == {"1": "pause"}  # R$3,00 por resultado
+
+
+def test_validated_keeps_and_others_pause():
+    got = actions([ad(1, 13, 10), ad(2, 4, 2), ad(3, 0, 0, active=False)])
+    assert got == {"1": "validate", "2": "pause"}
+
+
+def test_others_keep_running_when_option_off():
+    rules = Rules(**{**R.__dict__, "pause_others_on_validate": False})
+    assert actions([ad(1, 13, 10), ad(2, 4, 2)], rules) == {"1": "validate"}
+
+
+def test_results_sum():
+    row = {"actions": [{"action_type": R.result_action, "value": "7"},
                        {"action_type": "link_click", "value": "40"}]}
-    assert conversions(row, "offsite_conversion.fb_pixel_purchase") == 3
+    assert results(row, R.result_action) == 7
+
+
+def test_chunks():
+    assert chunks([1, 2, 3, 4, 5], 2) == [[1, 2], [3, 4], [5]]
 
 
 def test_parse_caption():

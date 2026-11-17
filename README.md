@@ -1,13 +1,15 @@
 # NoryxPlay — esteira automática de testes de criativos (Meta Ads)
 
 Você manda os vídeos num grupo do Telegram. O sistema baixa, sobe nas suas contas de
-anúncio pela **API oficial da Meta**, cria um conjunto de teste para cada criativo e depois
-pausa os ruins e escala os bons sozinho. Tudo é reportado no próprio grupo.
+anúncio pela **API oficial da Meta** e monta o teste do mesmo jeito que você faz na mão:
+uma cópia da sua campanha modelo (bid cap, R$100/dia) com um anúncio por criativo.
+Depois ele acompanha: o criativo que valida fica ativo e os outros são pausados.
+Tudo é reportado no próprio grupo. Roda num servidor, então sua internet cair não afeta nada.
 
 ```
-Grupo Telegram ──► collect ──► upload ──► Meta Ads (conjunto de teste por criativo)
-                                              │
-                         relatório ◄── rules ◄┘  (pausa / escala por CPA)
+Grupo Telegram ──► collect ──► upload ──► Meta Ads (cópia da campanha modelo,
+                                              │            1 anúncio por criativo)
+                         relatório ◄── rules ◄┘  (valida o bom, pausa os outros)
 ```
 
 ## 1. Preparar
@@ -19,9 +21,9 @@ Grupo Telegram ──► collect ──► upload ──► Meta Ads (conjunto d
 2. **Token da Meta:** no Business Manager → Configurações → Usuários do sistema, crie um usuário
    do sistema e dê acesso às contas de anúncio e páginas. Gere um token com `ads_management`,
    `ads_read` e `pages_read_engagement`.
-3. **Conjunto modelo:** em cada conta, crie uma campanha de teste (ABO) com **um conjunto modelo**
-   já configurado (pixel, evento, público, posicionamentos, orçamento diário). Cada criativo novo
-   vira uma cópia desse conjunto. Copie o ID dele.
+3. **Campanha modelo:** em cada conta, crie uma campanha pausada do jeito que você testa hoje
+   (bid cap, orçamento de R$100, destino WhatsApp) com **um conjunto e nenhum anúncio**.
+   Cada lote de criativos vira uma cópia dela. Copie o ID da campanha.
 
 ## 2. Instalar
 
@@ -34,13 +36,13 @@ cp config.example.yaml config.yaml   # preencha contas, produtos e regras
 
 ## 3. Usar
 
-No grupo, mande o vídeo com a legenda `#produto descrição`, por exemplo `#produtox gancho dor 2`.
+No grupo, mande o vídeo com a legenda `#produto descrição`, por exemplo `#dorama gancho final 2`.
 Sem hashtag, ele usa o `default_product`.
 
 ```bash
 python main.py collect   # baixa os vídeos novos do grupo
 python main.py upload    # sobe e cria os testes
-python main.py rules     # aplica as regras de pausa/escala
+python main.py rules     # valida o criativo bom e pausa os outros
 python main.py run       # faz tudo em loop a cada 15 min (--interval para mudar)
 python main.py retry     # tenta de novo os uploads que deram erro
 ```
@@ -51,14 +53,15 @@ pra você revisar antes; com `ACTIVE`, já entram rodando.
 
 ## Regras (config.yaml → `rules`)
 
-Valem só para os conjuntos criados pelo sistema; suas campanhas manuais não são tocadas.
-Métricas do dia:
+Valem só para as campanhas criadas pelo sistema; suas campanhas manuais não são tocadas.
+Os números contam desde que a campanha de teste foi criada.
 
 | Situação | Ação |
 |---|---|
-| Gastou `kill_spend_multiplier` × CPA alvo sem nenhuma venda | Pausa |
-| CPA acima de `kill_cpa_multiplier` × CPA alvo | Pausa |
-| CPA ≤ alvo e pelo menos `scale_min_conversions` vendas | +`scale_pct`% de orçamento (1× por dia, até `max_daily_budget`) |
+| Pelo menos `validate_min_results` conversas a no máximo `target_cost` cada | 🏆 Validou: fica ativo e você é avisado |
+| Gastou `kill_spend_no_result` sem nenhuma conversa | Pausa |
+| Já gastou `kill_min_spend` e o custo por conversa passou de `kill_cost_multiplier` × alvo | Pausa |
+| Outro criativo da mesma campanha validou (`pause_others_on_validate`) | Pausa |
 
 ## Limitações atuais
 
