@@ -47,7 +47,7 @@ Sem hashtag, ele usa o `default_product`.
 
 ```bash
 python main.py collect   # baixa os vídeos novos do grupo
-python main.py upload    # sobe e cria os testes
+python main.py upload    # repõe criativos nos números sem anúncio ativo
 python main.py rules     # valida o criativo bom e pausa os outros
 python main.py run       # faz tudo em loop a cada 15 min (--interval para mudar)
 python main.py retry     # tenta de novo os uploads que deram erro
@@ -57,6 +57,22 @@ python main.py retry     # tenta de novo os uploads que deram erro
 Quando estiver certo, mude para `false`. Se quiser que o sistema só suba os criativos e você
 continue validando e pausando na mão, use `auto_rules: false`. Com `test_status: PAUSED`, os testes nascem pausados
 pra você revisar antes; com `ACTIVE`, já entram rodando.
+
+## Banco de criativos e reposição automática
+
+Tudo que você manda no grupo vai para um **banco**. A cada ciclo (padrão: 15 min):
+
+1. As regras rodam e pausam o que não vendeu (ou você pausa na mão, se usar `auto_rules: false`).
+2. O sistema confere cada número. Se um número **não tem mais nenhum anúncio ativo**, ele pega os
+   próximos criativos do banco que ainda não foram testados naquele número e solta uma campanha
+   nova (cópia da campanha modelo do número).
+3. Criativo que **validou em qualquer número** tem prioridade para ir aos outros.
+4. Se não tiver criativo novo pra algum número parado, chega no grupo:
+   `⚠️ 2 número(s) parado(s) sem criativo novo pra testar: conta1/n3, conta4/n1. Manda mais criativos no grupo.`
+   (no máximo uma vez por dia para os mesmos números)
+
+Campanha criada pausada esperando você ligar **não** conta como parada, então o sistema não fica
+criando campanha em cima de campanha.
 
 ## Regras (config.yaml → `rules`)
 

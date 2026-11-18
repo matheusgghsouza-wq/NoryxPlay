@@ -2,7 +2,7 @@
 
 Uso:
   python main.py collect   # baixa vídeos novos do grupo do Telegram
-  python main.py upload    # sobe criativos pendentes e cria os testes
+  python main.py upload    # repõe criativos nos números sem anúncio ativo
   python main.py rules     # valida o criativo bom e pausa os outros
   python main.py retry     # libera para nova tentativa os uploads que deram erro
   python main.py run       # loop contínuo com tudo acima
@@ -23,13 +23,14 @@ log = logging.getLogger("noryx")
 def step_collect(s, conn, tg):
     new = tg.collect(conn)
     if new:
-        tg.send(f"📥 {len(new)} criativo(s) novo(s) recebido(s).")
+        tg.send(f"📥 {len(new)} criativo(s) novo(s) no banco. "
+                "Vão entrar nos números que ficarem sem anúncio ativo.")
 
 
 def step_upload(s, conn, tg, meta):
     lines = uploader.upload_all(conn, s, meta)
     if lines:
-        tg.send(_header(s, "Subida de testes") + "\n".join(lines))
+        tg.send(_header(s, "Reposição de criativos") + "\n".join(lines))
 
 
 def step_rules(s, conn, tg, meta):
@@ -71,8 +72,8 @@ def main():
         log.info("%s upload(s) com erro liberado(s) para nova tentativa.", n)
     else:
         while True:
-            for step in (lambda: step_collect(s, conn, tg), lambda: step_upload(s, conn, tg, meta),
-                         lambda: step_rules(s, conn, tg, meta)):
+            for step in (lambda: step_collect(s, conn, tg), lambda: step_rules(s, conn, tg, meta),
+                         lambda: step_upload(s, conn, tg, meta)):
                 try:
                     step()
                 except Exception:  # noqa: BLE001 - o loop não pode morrer

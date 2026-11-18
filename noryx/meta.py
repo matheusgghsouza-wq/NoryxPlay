@@ -123,7 +123,7 @@ class Meta:
 
     # ---------- leitura e ajustes ----------
     def campaign_ads(self, campaign_id: str) -> list[dict]:
-        return self.get(f"{campaign_id}/ads", fields="id,name,effective_status", limit=200).get("data", [])
+        return self.get(f"{campaign_id}/ads", fields="id,name,status,effective_status", limit=200).get("data", [])
 
     def ads_insights(self, campaign_id: str) -> list[dict]:
         """Métricas acumuladas de cada anúncio da campanha desde que ela foi criada."""
