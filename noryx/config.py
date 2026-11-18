@@ -22,14 +22,23 @@ class Product:
 
 
 @dataclass
-class Account:
-    """Uma conta de anúncio do seu Business Manager."""
+class Number:
+    """Um número de WhatsApp: a página ligada a ele e a campanha modelo que leva até ele."""
 
     key: str
-    ad_account_id: str  # sem o prefixo act_
     page_id: str
     template_campaign_id: str  # campanha modelo (bid cap + orçamento) copiada a cada lote de teste
     instagram_user_id: str = ""
+
+
+@dataclass
+class Account:
+    """Uma conta de anúncio, com os números (páginas) que anunciam por ela."""
+
+    key: str
+    ad_account_id: str  # sem o prefixo act_
+    numbers: dict[str, Number]
+    token: str  # token da Meta usado nesta conta
 
 
 @dataclass
@@ -58,13 +67,15 @@ class Settings:
     rules: Rules
     test_status: str  # ACTIVE ou PAUSED ao criar os testes
     max_ads_per_campaign: int
+    auto_rules: bool  # false = só sobe criativos; você mata na mão
 
 
 def load(path: str | Path = "config.yaml") -> Settings:
     load_dotenv()
     raw = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
 
-    accounts = {k: Account(key=k, **{kk: str(vv) for kk, vv in v.items()}) for k, v in raw.get("accounts", {}).items()}
+    default_token = os.environ.get("META_ACCESS_TOKEN", "")
+    accounts = {k: _account(k, v, default_token) for k, v in raw.get("accounts", {}).items()}
     products = {k: Product(key=k, **v) for k, v in raw.get("products", {}).items()}
     if not accounts:
         raise ValueError("Configure ao menos uma conta em 'accounts' no config.yaml")
@@ -76,7 +87,7 @@ def load(path: str | Path = "config.yaml") -> Settings:
     data_dir.mkdir(parents=True, exist_ok=True)
 
     return Settings(
-        meta_token=os.environ.get("META_ACCESS_TOKEN", ""),
+        meta_token=default_token,
         telegram_token=os.environ.get("TELEGRAM_BOT_TOKEN", ""),
         telegram_chat_id=str(os.environ.get("TELEGRAM_CHAT_ID", raw.get("telegram_chat_id", ""))),
         graph_version=raw.get("graph_version", "v23.0"),
@@ -88,4 +99,18 @@ def load(path: str | Path = "config.yaml") -> Settings:
         rules=Rules(**raw.get("rules", {})),
         test_status=raw.get("test_status", "PAUSED").upper(),
         max_ads_per_campaign=int(raw.get("max_ads_per_campaign", 5)),
+        auto_rules=bool(raw.get("auto_rules", True)),
     )
+
+
+def _account(key: str, raw: dict, default_token: str) -> Account:
+    numbers_raw = raw.get("numbers")
+    if not numbers_raw:  # formato simples: um número só, direto na conta
+        numbers_raw = {"1": {k: raw[k] for k in ("page_id", "template_campaign_id", "instagram_user_id") if k in raw}}
+    numbers = {str(nk): Number(key=str(nk), **{kk: str(vv) for kk, vv in nv.items()})
+               for nk, nv in numbers_raw.items()}
+    token_env = raw.get("token_env", "")
+    token = os.environ.get(token_env, "") if token_env else default_token
+    if token_env and not token:
+        raise ValueError(f"Conta {key}: variável {token_env} não encontrada no .env")
+    return Account(key=key, ad_account_id=str(raw["ad_account_id"]), numbers=numbers, token=token)

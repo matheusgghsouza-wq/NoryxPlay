@@ -1,8 +1,10 @@
 # NoryxPlay — esteira automática de testes de criativos (Meta Ads)
 
-Você manda os vídeos num grupo do Telegram. O sistema baixa, sobe nas suas contas de
-anúncio pela **API oficial da Meta** e monta o teste do mesmo jeito que você faz na mão:
-uma cópia da sua campanha modelo (bid cap, R$100/dia) com um anúncio por criativo.
+Você manda os vídeos **uma vez** num grupo do Telegram. O sistema baixa, sobe em todas as
+contas de anúncio e em todos os números de cada conta pela **API oficial da Meta**, e monta o
+teste do mesmo jeito que você faz na mão: uma cópia da campanha modelo de cada número
+(bid cap, R$100/dia) com um anúncio por criativo. Ex.: 10 contas × 5 números = 50 campanhas
+de teste a partir de um único envio no grupo.
 Depois ele acompanha: o criativo que valida fica ativo e os outros são pausados.
 Tudo é reportado no próprio grupo. Roda num servidor, então sua internet cair não afeta nada.
 
@@ -24,9 +26,10 @@ Grupo Telegram ──► collect ──► upload ──► Meta Ads (cópia da 
 3. **Rastreio de compra:** o sistema decide pelo custo por compra que aparece no seu gerenciador.
    O evento de compra precisa estar chegando na Meta (Pixel ou API de Conversões disparando quando o
    pagamento é confirmado). Se no gerenciador a coluna de compras está preenchida, já está certo.
-4. **Campanha modelo:** em cada conta, crie uma campanha pausada do jeito que você testa hoje
-   (bid cap, orçamento de R$100, destino WhatsApp) com **um conjunto e nenhum anúncio**.
-   Cada lote de criativos vira uma cópia dela. Copie o ID da campanha.
+4. **Campanha modelo por número:** para cada número, crie na conta dele uma campanha pausada do
+   jeito que você testa hoje (bid cap, orçamento de R$100, destino WhatsApp daquela página) com
+   **um conjunto e nenhum anúncio**. Cada lote de criativos vira uma cópia dela. Anote o ID da
+   campanha e o ID da página no `config.yaml`, em `accounts → numbers`.
 
 ## 2. Instalar
 
@@ -51,7 +54,8 @@ python main.py retry     # tenta de novo os uploads que deram erro
 ```
 
 **Comece com `dry_run: true`** no `config.yaml`: ele mostra tudo o que faria sem criar nada.
-Quando estiver certo, mude para `false`. Com `test_status: PAUSED`, os testes nascem pausados
+Quando estiver certo, mude para `false`. Se quiser que o sistema só suba os criativos e você
+continue validando e pausando na mão, use `auto_rules: false`. Com `test_status: PAUSED`, os testes nascem pausados
 pra você revisar antes; com `ACTIVE`, já entram rodando.
 
 ## Regras (config.yaml → `rules`)

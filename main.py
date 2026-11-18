@@ -14,7 +14,7 @@ import logging
 import time
 
 from noryx import config, db, rules, uploader
-from noryx.meta import Meta
+from noryx.meta import MetaPool
 from noryx.telegram import Telegram
 
 log = logging.getLogger("noryx")
@@ -33,6 +33,8 @@ def step_upload(s, conn, tg, meta):
 
 
 def step_rules(s, conn, tg, meta):
+    if not s.auto_rules:
+        return
     lines = rules.run(conn, s, meta)
     if lines:
         tg.send(_header(s, "Regras automáticas") + "\n".join(lines))
@@ -53,7 +55,7 @@ def main():
     s = config.load(args.config)
     conn = db.connect(s.data_dir)
     tg = Telegram(s)
-    meta = Meta(s.meta_token, s.graph_version, s.dry_run)
+    meta = MetaPool(s)
     if s.dry_run:
         log.warning("dry_run ATIVO: nada será criado ou alterado na Meta.")
 

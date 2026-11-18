@@ -4,19 +4,27 @@ dry_run: true
 graph_version: v23.0
 test_status: PAUSED     # PAUSED = cria a campanha de teste pausada pra você revisar; ACTIVE = já liga
 max_ads_per_campaign: 5 # quantos criativos entram em cada campanha de teste
+auto_rules: true        # false = o sistema só sobe criativos; validar e pausar fica com você
 data_dir: data
 
-# Contas de anúncio do seu Business Manager
+# Contas de anúncio. Cada conta tem os números (páginas com WhatsApp) que anunciam por ela.
+# Para cada número: a página ligada a ele e a campanha modelo que você testa hoje
+# (bid cap, R$100/dia, destino WhatsApp, 1 conjunto e nenhum anúncio).
 accounts:
   conta1:
-    ad_account_id: "1234567890"        # sem o "act_"
-    page_id: "111111111111111"
-    template_campaign_id: "2385000000000"  # campanha modelo: bid cap, R$100/dia, 1 conjunto, sem anúncios
-    instagram_user_id: ""               # opcional
+    ad_account_id: "1234567890"   # sem o "act_"
+    # token_env: META_TOKEN_CONTA1  # opcional: token próprio desta conta (no .env); sem isso usa META_ACCESS_TOKEN
+    numbers:
+      n1: { page_id: "111111111111111", template_campaign_id: "2385000000001" }
+      n2: { page_id: "222222222222222", template_campaign_id: "2385000000002" }
+      n3: { page_id: "333333333333333", template_campaign_id: "2385000000003" }
+      n4: { page_id: "444444444444444", template_campaign_id: "2385000000004" }
+      n5: { page_id: "555555555555555", template_campaign_id: "2385000000005" }
   # conta2:
   #   ad_account_id: "..."
-  #   page_id: "..."
-  #   template_campaign_id: "..."
+  #   numbers:
+  #     n1: { page_id: "...", template_campaign_id: "..." }
+  #     ...
 
 # Produtos/ofertas. No grupo, mande o vídeo com legenda "#chave descrição".
 products:
@@ -25,7 +33,7 @@ products:
     headline: ""             # opcional
     cta: WHATSAPP_MESSAGE    # anúncio de clique para WhatsApp
     # link: https://...      # só se usar outro CTA (LEARN_MORE, SIGN_UP...)
-    accounts: [conta1]       # vazio = sobe em todas as contas
+    accounts: []             # vazio = sobe em todas as contas; ou ex.: [conta1, conta3]
 default_product: dorama
 
 # Regras do seu método: o criativo que valida fica, os outros são pausados.

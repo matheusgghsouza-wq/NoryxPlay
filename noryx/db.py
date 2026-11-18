@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS uploads (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     creative_id INTEGER NOT NULL REFERENCES creatives(id),
     account_key TEXT NOT NULL,
+    number_key TEXT NOT NULL,
     video_id TEXT,
     creative_meta_id TEXT,
     campaign_id TEXT,
@@ -27,7 +28,7 @@ CREATE TABLE IF NOT EXISTS uploads (
     status TEXT NOT NULL DEFAULT 'pending',  -- pending | done | error
     error TEXT,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(creative_id, account_key)
+    UNIQUE(creative_id, account_key, number_key)
 );
 CREATE TABLE IF NOT EXISTS actions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

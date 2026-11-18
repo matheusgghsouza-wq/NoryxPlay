@@ -132,3 +132,15 @@ class Meta:
 
     def pause(self, object_id: str) -> None:
         self.post(object_id, status="PAUSED")
+
+
+class MetaPool:
+    """Um cliente da Meta por conta de anúncio."""
+
+    def __init__(self, settings):
+        self.dry_run = settings.dry_run
+        self._clients = {k: Meta(a.token, settings.graph_version, settings.dry_run)
+                         for k, a in settings.accounts.items()}
+
+    def __getitem__(self, account_key: str) -> Meta:
+        return self._clients[account_key]

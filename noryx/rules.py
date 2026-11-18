@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from datetime import date
 
 from .config import Rules, Settings
-from .meta import Meta
+from .meta import MetaPool
 
 log = logging.getLogger(__name__)
 
@@ -56,16 +56,19 @@ def decide_campaign(ads: list[AdStat], rules: Rules) -> list[tuple[AdStat, str, 
     return out
 
 
-def run(conn: sqlite3.Connection, settings: Settings, meta: Meta) -> list[str]:
+def run(conn: sqlite3.Connection, settings: Settings, pool: MetaPool) -> list[str]:
     today = date.today().isoformat()
-    campaigns = [r["campaign_id"] for r in conn.execute(
-        "SELECT DISTINCT campaign_id FROM uploads WHERE status = 'done' AND campaign_id IS NOT NULL")]
+    campaigns = [(r["campaign_id"], r["account_key"]) for r in conn.execute(
+        "SELECT DISTINCT campaign_id, account_key FROM uploads WHERE status = 'done' AND campaign_id IS NOT NULL")]
 
     report = []
-    for campaign_id in campaigns:
-        statuses = {a["id"]: a for a in meta.campaign_ads(campaign_id)}
+    for campaign_id, acc_key in campaigns:
+        if acc_key not in settings.accounts:
+            continue
+        api = pool[acc_key]
+        statuses = {a["id"]: a for a in api.campaign_ads(campaign_id)}
         ads = []
-        for row in meta.ads_insights(campaign_id):
+        for row in api.ads_insights(campaign_id):
             info = statuses.get(row["ad_id"], {})
             ads.append(AdStat(row["ad_id"], row.get("ad_name", ""), float(row.get("spend", 0)),
                               results(row, settings.rules.result_action),
@@ -79,9 +82,9 @@ def run(conn: sqlite3.Connection, settings: Settings, meta: Meta) -> list[str]:
                     continue
                 report.append(f"🏆 VALIDOU: {ad.name} ({reason})")
             else:
-                meta.pause(ad.ad_id)
+                api.pause(ad.ad_id)
                 report.append(f"⏸️ {ad.name}: {reason}")
-            if not meta.dry_run:
+            if not pool.dry_run:
                 conn.execute("INSERT INTO actions (object_id, action, detail, day) VALUES (?, ?, ?, ?)",
                              (ad.ad_id, action, reason, today))
                 conn.commit()
