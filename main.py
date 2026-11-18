@@ -1,6 +1,7 @@
 """NoryxPlay - automação de testes de criativos na Meta.
 
 Uso:
+  python main.py check     # confere tokens, contas, páginas e campanhas modelo (só lê)
   python main.py collect   # baixa vídeos novos do grupo do Telegram
   python main.py upload    # repõe criativos nos números sem anúncio ativo
   python main.py rules     # valida o criativo bom e pausa os outros
@@ -13,7 +14,9 @@ import argparse
 import logging
 import time
 
-from noryx import config, db, rules, uploader
+import sys
+
+from noryx import check, config, db, rules, uploader
 from noryx.meta import MetaPool
 from noryx.telegram import Telegram
 
@@ -47,13 +50,15 @@ def _header(s, title):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("command", choices=["collect", "upload", "rules", "retry", "run"])
+    p.add_argument("command", choices=["check", "collect", "upload", "rules", "retry", "run"])
     p.add_argument("--config", default="config.yaml")
     p.add_argument("--interval", type=int, default=15, help="minutos entre ciclos no modo run")
     args = p.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     s = config.load(args.config)
+    if args.command == "check":
+        sys.exit(0 if check.run(s) else 1)
     conn = db.connect(s.data_dir)
     tg = Telegram(s)
     meta = MetaPool(s)

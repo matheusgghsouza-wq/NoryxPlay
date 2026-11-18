@@ -99,3 +99,66 @@ def test_pick_respects_product_accounts(tmp_path):
     conn = _bank(tmp_path)
     settings = SimpleNamespace(products={"p": Product(key="p", message="m", accounts=["c9"])})
     assert pick_creatives(conn, settings, "c1", "n1", 3) == []
+
+
+# ---------- check ----------
+from noryx import check  # noqa: E402
+from noryx.config import Account, Number  # noqa: E402
+from noryx.meta import Meta, MetaError  # noqa: E402
+
+
+class _Resp:
+    def __init__(self, data):
+        self._d = data
+
+    def json(self):
+        return self._d
+
+
+def _check_settings():
+    acc = Account("c1", "100", {"n1": Number("n1", "P1", "T1"), "n2": Number("n2", "P2", "T2")}, "tok")
+    return SimpleNamespace(telegram_token="t", telegram_chat_id="-1", graph_version="v23.0", dry_run=True,
+                           accounts={"c1": acc})
+
+
+def _fake_get(bad: bool):
+    def get(self, path, **params):
+        if path == "act_100":
+            return {"name": "Conta 1", "account_status": 1, "currency": "BRL"}
+        if path in ("P1", "P2"):
+            return {"name": f"Página {path}"}
+        if path == "T1":
+            return {"name": "Modelo 1", "account_id": "100", "bid_strategy": "LOWEST_COST_WITH_BID_CAP",
+                    "daily_budget": "10000"}
+        if path == "T2":
+            if bad:
+                raise MetaError("(#100) objeto não existe")
+            return {"name": "Modelo 2", "account_id": "100", "daily_budget": "10000"}
+        if path.endswith("/adsets"):
+            return {"data": [{"id": "a"}]}
+        if path.endswith("/ads"):
+            return {"data": [{"id": "x"}] if bad and path.startswith("T1") else []}
+        raise AssertionError(path)
+    return get
+
+
+def _fake_tg(url, params=None, timeout=None):
+    if url.endswith("/getMe"):
+        return _Resp({"ok": True, "result": {"username": "noryx_bot"}})
+    return _Resp({"ok": True, "result": {"title": "Criativos"}})
+
+
+def test_check_all_good(monkeypatch, capsys):
+    monkeypatch.setattr(Meta, "get", _fake_get(bad=False))
+    monkeypatch.setattr(check.requests, "get", _fake_tg)
+    assert check.run(_check_settings()) is True
+    assert "Tudo certo" in capsys.readouterr().out
+
+
+def test_check_finds_problems(monkeypatch, capsys):
+    monkeypatch.setattr(Meta, "get", _fake_get(bad=True))
+    monkeypatch.setattr(check.requests, "get", _fake_tg)
+    assert check.run(_check_settings()) is False
+    out = capsys.readouterr().out
+    assert "1 anúncio(s) (precisa ter 0)" in out
+    assert "sem acesso à campanha modelo T2" in out

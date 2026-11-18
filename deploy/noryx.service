@@ -1,0 +1,19 @@
+# Serviço systemd: mantém o NoryxPlay rodando 24h e reinicia sozinho se cair.
+# Instalação (na VPS, dentro da pasta do projeto):
+#   sudo cp deploy/noryx.service /etc/systemd/system/noryx.service
+#   sudo systemctl daemon-reload && sudo systemctl enable --now noryx
+# Ver o que está acontecendo:  journalctl -u noryx -f
+[Unit]
+Description=NoryxPlay - esteira de criativos Meta Ads
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=noryx
+WorkingDirectory=/opt/noryx
+ExecStart=/opt/noryx/.venv/bin/python main.py run --interval 15
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

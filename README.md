@@ -14,31 +14,81 @@ Grupo Telegram ──► collect ──► upload ──► Meta Ads (cópia da 
                          relatório ◄── rules ◄┘  (valida o bom, pausa os outros)
 ```
 
-## 1. Preparar
+## 1. Preparar (uma vez só)
 
-1. **Bot do Telegram:** fale com o `@BotFather`, crie um bot e copie o token. Adicione o bot ao
-   seu grupo de criativos e, no BotFather, desative o *Group Privacy* (`/setprivacy` → Disable)
-   para ele ler as mensagens. Para descobrir o ID do grupo, mande uma mensagem lá e abra
-   `https://api.telegram.org/bot<TOKEN>/getUpdates`.
-2. **Token da Meta:** no Business Manager → Configurações → Usuários do sistema, crie um usuário
-   do sistema e dê acesso às contas de anúncio e páginas. Gere um token com `ads_management`,
-   `ads_read` e `pages_read_engagement`.
-3. **Rastreio de compra:** o sistema decide pelo custo por compra que aparece no seu gerenciador.
-   O evento de compra precisa estar chegando na Meta (Pixel ou API de Conversões disparando quando o
-   pagamento é confirmado). Se no gerenciador a coluna de compras está preenchida, já está certo.
-4. **Campanha modelo por número:** para cada número, crie na conta dele uma campanha pausada do
-   jeito que você testa hoje (bid cap, orçamento de R$100, destino WhatsApp daquela página) com
-   **um conjunto e nenhum anúncio**. Cada lote de criativos vira uma cópia dela. Anote o ID da
-   campanha e o ID da página no `config.yaml`, em `accounts → numbers`.
+### 1.1 Bot do Telegram
+1. No Telegram, fale com o `@BotFather` → `/newbot` → escolha um nome. Copie o **token**.
+2. Ainda no BotFather: `/setprivacy` → escolha o bot → **Disable** (para ele ler o grupo).
+3. Adicione o bot ao seu grupo de criativos.
+4. Mande qualquer mensagem no grupo e abra `https://api.telegram.org/bot<TOKEN>/getUpdates`
+   no navegador. O número em `"chat":{"id": -100...}` é o **ID do grupo**.
+
+### 1.2 App no Meta for Developers
+1. Acesse **developers.facebook.com** → **Meus apps** → **Criar app**.
+2. Tipo/caso de uso: **Outro** → **Empresa** (Business). Dê um nome (ex.: "Noryx") e, em
+   "Portfólio empresarial", escolha o **seu Business Manager**.
+3. No painel do app, em **Adicionar produtos**, adicione **Marketing API**.
+4. O app pode ficar no modo de desenvolvimento e **não precisa passar por revisão** para mexer nas
+   contas do seu próprio Business Manager.
+
+### 1.3 Usuário do sistema e token (não expira)
+1. Acesse **business.facebook.com/settings** → **Usuários** → **Usuários do sistema** → **Adicionar**.
+   Nome "noryx", função **Administrador**.
+2. Selecione o usuário → **Atribuir ativos**:
+   - **Contas de anúncios**: marque todas as que o sistema vai usar → controle total.
+   - **Páginas**: marque as páginas dos números → controle total.
+3. Ainda no usuário → **Gerar novo token** → escolha o app criado → validade **Nunca**. Marque:
+   `ads_management`, `ads_read`, `business_management`, `pages_read_engagement`,
+   `pages_show_list`.
+4. Copie o token e cole no `.env` em `META_ACCESS_TOKEN=`. **Não mande esse token pra ninguém**:
+   quem tem ele mexe nas suas contas.
+5. Contas em outro Business Manager: repita 1.2 e 1.3 nele, coloque o token no `.env` com outro
+   nome (ex.: `META_TOKEN_BM2=`) e, no `config.yaml`, use `token_env: META_TOKEN_BM2` nessas contas.
+
+> Os nomes dos menus da Meta mudam de vez em quando. Se algo não bater, procure pelo mesmo
+> conceito (app empresarial, usuário do sistema, atribuir ativos, gerar token).
+
+### 1.4 Rastreio de compra
+O sistema decide pelo custo por compra que aparece no seu gerenciador. O evento de compra precisa
+estar chegando na Meta (Pixel ou API de Conversões disparando quando o pagamento é confirmado).
+Se a coluna **Compras** está preenchida no gerenciador, já está certo.
+
+### 1.5 Campanha modelo por número
+Para cada número, crie na conta dele uma campanha **pausada** do jeito que você testa hoje
+(bid cap, R$100/dia, destino WhatsApp daquela página) com **um conjunto e nenhum anúncio**.
+Cada lote de criativos vira uma cópia dela.
+
+Onde achar os IDs:
+- **Conta de anúncio**: no gerenciador, no seletor de contas (número abaixo do nome). Use sem `act_`.
+- **Campanha modelo**: na aba Campanhas, ative a coluna **ID da campanha** (Colunas → Personalizar).
+- **Página**: na página → **Sobre** → **Transparência da página** (ou em business.facebook.com/settings → Páginas).
+
+Preencha tudo no `config.yaml`, em `accounts → numbers`.
 
 ## 2. Instalar
 
+### No seu computador (para testar)
 ```bash
 python -m venv .venv && source .venv/bin/activate   # no Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env                 # preencha os tokens
-cp config.example.yaml config.yaml   # preencha contas, produtos e regras
+cp config.example.yaml config.yaml   # preencha contas, números, produtos e regras
+python main.py check                 # confere se está tudo certo
 ```
+
+O `check` só lê, não cria nada. Ele mostra ✅ ou ❌ para o bot, o grupo, cada conta, cada página e
+cada campanha modelo (se está na conta certa, com 1 conjunto e 0 anúncios).
+
+### Na VPS (para rodar 24h)
+Qualquer VPS Ubuntu/Debian pequena serve (1 vCPU, 1 GB de RAM). Como root, na VPS:
+```bash
+curl -O https://raw.githubusercontent.com/SEU_USUARIO/SEU_REPO/main/deploy/instalar-vps.sh
+bash instalar-vps.sh https://github.com/SEU_USUARIO/SEU_REPO.git
+```
+O script instala tudo em `/opt/noryx` e mostra os próximos passos: preencher `.env` e
+`config.yaml`, rodar o `check` e ligar o serviço (`systemctl enable --now noryx`). O serviço
+reinicia sozinho se cair ou se a VPS reiniciar. Para acompanhar: `journalctl -u noryx -f`.
+Se o repositório for privado, clone com um token de acesso do GitHub.
 
 ## 3. Usar
 
@@ -46,6 +96,7 @@ No grupo, mande o vídeo com a legenda `#produto descrição`, por exemplo `#dor
 Sem hashtag, ele usa o `default_product`.
 
 ```bash
+python main.py check     # confere tokens, contas, páginas e campanhas modelo
 python main.py collect   # baixa os vídeos novos do grupo
 python main.py upload    # repõe criativos nos números sem anúncio ativo
 python main.py rules     # valida o criativo bom e pausa os outros
