@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Entrar · Noryx{% endblock %}
+{% block body %}
+<div style="max-width:360px;margin:15vh auto 0">
+  <h1 style="margin:0 0 4px">Noryx</h1>
+  <p class="muted" style="margin:0 0 20px">Seus criativos e números num lugar só.</p>
+  <form method="post" class="card">
+    <label for="password" style="margin-top:0">Senha</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" autofocus required>
+    <div style="height:16px"></div>
+    <button class="btn" type="submit">Entrar</button>
+  </form>
+</div>
+{% endblock %}

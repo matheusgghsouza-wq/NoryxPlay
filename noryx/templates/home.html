@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block head %}
+<style>
+  .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+  .stat b { display: block; font-size: 28px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .stat span { color: var(--muted); font-size: 14px; }
+  .stat.alert b { color: var(--bad); }
+  @media (min-width: 600px) { .stats { grid-template-columns: repeat(4, 1fr); } }
+</style>
+<meta http-equiv="refresh" content="120">
+{% endblock %}
+{% block body %}
+<div class="stats">
+  <div class="stat"><b>{{ d.running }}/{{ d.total_numbers }}</b><span>números rodando</span></div>
+  <div class="stat {% if d.idle %}alert{% endif %}"><b>{{ d.idle }}</b><span>parados sem criativo</span></div>
+  <div class="stat"><b>{{ d.in_bank }}</b><span>criativos no banco</span></div>
+  <div class="stat"><b>{{ d.validated_today }}</b><span>validaram hoje</span></div>
+</div>
+
+<a class="btn" href="/enviar">+ Enviar criativos</a>
+
+{% if d.idle %}
+<div class="banner" style="margin-top:14px">
+  {{ d.idle }} número(s) parado(s) esperando criativo novo. Envie mais vídeos que eles voltam a rodar no próximo ciclo.
+</div>
+{% endif %}
+
+<h2>Números</h2>
+<div class="card">
+  <ul class="list">
+  {% for n in d.numbers %}
+    <li>
+      <div><b>{{ n.account }} · {{ n.number }}</b>
+        <div class="muted">{{ n.tested }} criativo(s) testado(s){% if n.at %} · atualizado {{ n.at|quando(true) }}{% endif %}</div></div>
+      <span class="chip {{ n.state }}">{{ n.label }}</span>
+    </li>
+  {% else %}
+    <li class="empty">Nenhum número configurado no config.yaml.</li>
+  {% endfor %}
+  </ul>
+</div>
+
+<h2>O que aconteceu</h2>
+<div class="card">
+  <ul class="list">
+  {% for a in d.recent_actions %}
+    <li>
+      <div>
+        <b>{% if a.action == 'validate' %}🏆 Validou{% else %}⏸️ Pausado{% endif %}</b>
+        {% if a.creative_id %}· #{{ a.creative_id }} {{ a.variant or '' }}{% endif %}
+        <div class="muted">{{ a.detail }}{% if a.account_key %} · {{ a.account_key }}/{{ a.number_key }}{% endif %}</div>
+      </div>
+      <span class="muted" style="white-space:nowrap">{{ a.created_at|quando }}</span>
+    </li>
+  {% else %}
+    <li class="empty">Nada ainda. As validações e pausas aparecem aqui.</li>
+  {% endfor %}
+  </ul>
+</div>
+
+<h2>Últimos criativos</h2>
+<div class="card">
+  <ul class="list">
+  {% for c in d.recent_creatives %}
+    <li>
+      <div><b>#{{ c.id }} {{ c.variant or '' }}</b>
+        <div class="muted">{{ c.product_key }} · em {{ c.numbers }} número(s){% if c.wins %} · 🏆 validou {{ c.wins }}x{% endif %}</div></div>
+      <span class="chip {% if c.numbers %}rodando{% else %}aguardando{% endif %}">{% if c.numbers %}Em teste{% else %}No banco{% endif %}</span>
+    </li>
+  {% else %}
+    <li class="empty">Nenhum criativo enviado ainda.</li>
+  {% endfor %}
+  </ul>
+</div>
+{% endblock %}

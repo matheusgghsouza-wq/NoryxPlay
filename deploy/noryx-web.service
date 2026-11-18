@@ -1,0 +1,16 @@
+# Painel web do NoryxPlay (enviar vídeos e acompanhar os números).
+# Instalação: sudo cp deploy/noryx-web.service /etc/systemd/system/ && sudo systemctl enable --now noryx-web
+[Unit]
+Description=NoryxPlay - painel web
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=noryx
+WorkingDirectory=/opt/noryx
+ExecStart=/opt/noryx/.venv/bin/python main.py web --port 8080
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

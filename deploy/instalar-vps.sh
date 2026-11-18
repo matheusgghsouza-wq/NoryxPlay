@@ -17,7 +17,7 @@ python3 -m venv .venv
 [ -f .env ] || cp .env.example .env
 [ -f config.yaml ] || cp config.example.yaml config.yaml
 chown -R noryx:noryx /opt/noryx
-cp deploy/noryx.service /etc/systemd/system/noryx.service
+cp deploy/noryx.service deploy/noryx-web.service /etc/systemd/system/
 systemctl daemon-reload
 
 echo
@@ -25,5 +25,5 @@ echo "Pronto. Agora:"
 echo "  1) nano /opt/noryx/.env          (tokens)"
 echo "  2) nano /opt/noryx/config.yaml   (contas, números, regras)"
 echo "  3) cd /opt/noryx && sudo -u noryx .venv/bin/python main.py check"
-echo "  4) systemctl enable --now noryx  (liga 24h)"
-echo "  5) journalctl -u noryx -f        (acompanhar)"
+echo "  4) systemctl enable --now noryx noryx-web  (liga o robô e o painel 24h)"
+echo "  5) Painel: http://IP_DA_VPS:8080   |   logs: journalctl -u noryx -f"

@@ -1,6 +1,6 @@
 # NoryxPlay — esteira automática de testes de criativos (Meta Ads)
 
-Você manda os vídeos **uma vez** num grupo do Telegram. O sistema baixa, sobe em todas as
+Você manda os vídeos **uma vez** pelo painel no celular (ou pelo grupo do Telegram). O sistema baixa, sobe em todas as
 contas de anúncio e em todos os números de cada conta pela **API oficial da Meta**, e monta o
 teste do mesmo jeito que você faz na mão: uma cópia da campanha modelo de cada número
 (bid cap, R$100/dia) com um anúncio por criativo. Ex.: 10 contas × 5 números = 50 campanhas
@@ -90,6 +90,24 @@ O script instala tudo em `/opt/noryx` e mostra os próximos passos: preencher `.
 reinicia sozinho se cair ou se a VPS reiniciar. Para acompanhar: `journalctl -u noryx -f`.
 Se o repositório for privado, clone com um token de acesso do GitHub.
 
+## Painel (enviar vídeos pelo celular)
+
+O jeito mais fácil de mandar criativo. Abra o painel no celular, toque em **Enviar criativos**,
+escolha os vídeos da galeria (pode vários de uma vez) e pronto: eles vão para o banco.
+
+Na tela inicial você vê:
+- quantos números estão **rodando** e quantos estão **parados sem criativo**;
+- quantos criativos estão no banco esperando vez;
+- o que **validou** e o que foi **pausado**, com horário (de Brasília);
+- os últimos criativos e em quantos números cada um está.
+
+Para ligar: coloque uma senha em `PANEL_PASSWORD` no `.env` e rode `python main.py web`
+(na VPS, o serviço `noryx-web` já faz isso). Acesse `http://IP_DA_VPS:8080`.
+No celular, use **Adicionar à tela inicial** no menu do navegador para abrir como um aplicativo.
+
+- Aceita MP4 e MOV de até 1 GB (no Telegram o limite é 20 MB).
+- Para acesso com cadeado (HTTPS), aponte um domínio para a VPS e use o Caddy na frente do painel.
+
 ## 3. Usar
 
 No grupo, mande o vídeo com a legenda `#produto descrição`, por exemplo `#dorama gancho final 2`.
@@ -142,5 +160,4 @@ Os números contam desde que a campanha de teste foi criada.
 
 - A Bot API do Telegram em nuvem só baixa arquivos de **até 20 MB**. Vídeos maiores: comprima ou
   rode um servidor local da Bot API.
-- Ainda não tem painel web. Por enquanto o acompanhamento é pelo relatório no grupo.
 - A versão da Graph API (`graph_version`) deve ser conferida com a versão atual no site da Meta.

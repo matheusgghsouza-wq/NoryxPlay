@@ -162,3 +162,51 @@ def test_check_finds_problems(monkeypatch, capsys):
     out = capsys.readouterr().out
     assert "1 anúncio(s) (precisa ter 0)" in out
     assert "sem acesso à campanha modelo T2" in out
+
+
+# ---------- painel web ----------
+import io  # noqa: E402
+
+from noryx.web import create_app  # noqa: E402
+
+
+def _web(tmp_path):
+    acc = Account("conta1", "1", {"n1": Number("n1", "P", "T"), "n2": Number("n2", "P2", "T2")}, "tok")
+    s = SimpleNamespace(data_dir=tmp_path, dry_run=True, accounts={"conta1": acc},
+                        products={"dorama": Product("dorama", "m")}, default_product="dorama")
+    app = create_app(s, password="segredo")
+    app.config["TESTING"] = True
+    return app.test_client(), s
+
+
+def test_web_requires_login(tmp_path):
+    client, _ = _web(tmp_path)
+    assert client.get("/").status_code == 302
+    assert client.post("/api/enviar").status_code == 401
+    assert "Senha errada" in client.post("/login", data={"password": "x"}, follow_redirects=True).text
+
+
+def test_web_upload_goes_to_bank(tmp_path):
+    client, s = _web(tmp_path)
+    client.post("/login", data={"password": "segredo"})
+    r = client.post("/api/enviar", data={"product": "dorama", "variant": "gancho 1",
+                                         "video": (io.BytesIO(b"fake"), "video.mp4")},
+                    content_type="multipart/form-data")
+    assert r.json == {"ok": True, "id": 1, "name": "gancho 1"}
+    bad = client.post("/api/enviar", data={"video": (io.BytesIO(b"x"), "foto.jpg")},
+                      content_type="multipart/form-data")
+    assert bad.status_code == 400
+    home = client.get("/").text
+    assert "#1 gancho 1" in home and "No banco" in home and "0/2" in home
+    conn = db.connect(tmp_path)
+    row = conn.execute("SELECT * FROM creatives").fetchone()
+    assert row["product_key"] == "dorama" and Path(row["local_path"]).read_bytes() == b"fake"
+
+
+def test_web_shows_brasilia_time(tmp_path):
+    client, _ = _web(tmp_path)
+    app = client.application
+    assert app.jinja_env.filters["quando"]("2026-11-18 03:34:00") == "18/11 00:34"
+    assert app.jinja_env.filters["quando"]("2026-11-18 03:34:00", True) == "00:34"
+    assert app.jinja_env.filters["quando"]("2026-11-18T03:34") == "18/11 00:34"
+    assert app.jinja_env.filters["quando"]("lixo") == "lixo"

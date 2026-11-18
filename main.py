@@ -7,6 +7,7 @@ Uso:
   python main.py rules     # valida o criativo bom e pausa os outros
   python main.py retry     # libera para nova tentativa os uploads que deram erro
   python main.py run       # loop contínuo com tudo acima
+  python main.py web       # painel no navegador/celular para enviar vídeos e acompanhar
 """
 from __future__ import annotations
 
@@ -50,15 +51,23 @@ def _header(s, title):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("command", choices=["check", "collect", "upload", "rules", "retry", "run"])
+    p.add_argument("command", choices=["check", "collect", "upload", "rules", "retry", "run", "web"])
     p.add_argument("--config", default="config.yaml")
     p.add_argument("--interval", type=int, default=15, help="minutos entre ciclos no modo run")
+    p.add_argument("--port", type=int, default=8080, help="porta do painel (modo web)")
     args = p.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     s = config.load(args.config)
     if args.command == "check":
         sys.exit(0 if check.run(s) else 1)
+    if args.command == "web":
+        from waitress import serve
+
+        from noryx.web import create_app
+        log.info("Painel em http://0.0.0.0:%s", args.port)
+        serve(create_app(s), host="0.0.0.0", port=args.port, max_request_body_size=1100 * 1024 * 1024)
+        return
     conn = db.connect(s.data_dir)
     tg = Telegram(s)
     meta = MetaPool(s)

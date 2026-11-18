@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1115">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icon.svg">
+<title>{% block title %}Noryx{% endblock %}</title>
+<style>
+  :root {
+    --bg: #f5f6f8; --card: #ffffff; --text: #14161a; --muted: #6b7280; --line: #e5e7eb;
+    --accent: #4f7cff; --accent-text: #ffffff;
+    --ok: #12805c; --ok-bg: #e6f6ef; --warn: #b45309; --warn-bg: #fdf3e2;
+    --bad: #b42318; --bad-bg: #fdecea; --idle: #6b7280; --idle-bg: #eef0f3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1115; --card: #181b21; --text: #eef0f3; --muted: #9aa1ac; --line: #2a2f38;
+      --accent: #5b86ff; --ok: #4ade9b; --ok-bg: #12352a; --warn: #fbbf5a; --warn-bg: #3a2c12;
+      --bad: #ff8a80; --bad-bg: #3a1a18; --idle: #9aa1ac; --idle-bg: #242830;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 16px 16px 96px; }
+  header { display: flex; align-items: center; justify-content: space-between; margin: 4px 0 16px; }
+  header a.brand { font-weight: 700; font-size: 20px; color: var(--text); text-decoration: none; }
+  header nav a { color: var(--muted); text-decoration: none; margin-left: 16px; font-size: 15px; }
+  h2 { font-size: 15px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted);
+       margin: 28px 0 10px; font-weight: 600; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .btn { display: block; width: 100%; text-align: center; background: var(--accent); color: var(--accent-text);
+         border: 0; border-radius: 12px; padding: 16px; font-size: 17px; font-weight: 600;
+         text-decoration: none; cursor: pointer; }
+  .btn:disabled { opacity: .5; }
+  .banner { background: var(--warn-bg); color: var(--warn); border-radius: 12px; padding: 10px 14px;
+            font-size: 14px; margin-bottom: 14px; }
+  .flash { background: var(--bad-bg); color: var(--bad); border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; }
+  .chip { display: inline-block; font-size: 13px; font-weight: 600; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+  .chip.rodando { background: var(--ok-bg); color: var(--ok); }
+  .chip.sem_criativo { background: var(--bad-bg); color: var(--bad); }
+  .chip.aguardando { background: var(--idle-bg); color: var(--idle); }
+  .list { list-style: none; margin: 0; padding: 0; }
+  .list li { display: flex; justify-content: space-between; align-items: center; gap: 12px;
+             padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .list li:last-child { border-bottom: 0; }
+  .muted { color: var(--muted); font-size: 14px; }
+  .empty { color: var(--muted); text-align: center; padding: 8px 0; }
+  label { display: block; font-weight: 600; margin: 14px 0 6px; }
+  input[type=text], input[type=password], select {
+    width: 100%; padding: 13px 14px; font-size: 16px; border-radius: 12px;
+    border: 1px solid var(--line); background: var(--card); color: var(--text); }
+</style>
+{% block head %}{% endblock %}
+</head>
+<body>
+<div class="wrap">
+  {% if session.get('ok') %}
+  <header>
+    <a class="brand" href="/">Noryx</a>
+    <nav><a href="/enviar">Enviar</a><a href="/sair">Sair</a></nav>
+  </header>
+  {% endif %}
+  {% if dry_run and session.get('ok') %}
+  <div class="banner">Modo simulação ligado: nada é criado na Meta. Desligue em <b>dry_run</b> no config.yaml.</div>
+  {% endif %}
+  {% for m in get_flashed_messages() %}<div class="flash">{{ m }}</div>{% endfor %}
+  {% block body %}{% endblock %}
+</div>
+</body>
+</html>

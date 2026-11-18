@@ -87,12 +87,15 @@ def upload_all(conn: sqlite3.Connection, settings: Settings, pool: MetaPool) -> 
     for acc_key, acc in settings.accounts.items():
         for num_key in acc.numbers:
             if not number_is_idle(conn, pool, acc_key, num_key):
+                db.set_number_state(conn, acc_key, num_key, "rodando")
                 continue
             picks = pick_creatives(conn, settings, acc_key, num_key, settings.max_ads_per_campaign)
             if picks:
                 plan.setdefault(acc_key, {})[num_key] = picks
+                db.set_number_state(conn, acc_key, num_key, "rodando")
             else:
                 empty.append(f"{acc_key}/{num_key}")
+                db.set_number_state(conn, acc_key, num_key, "sem_criativo")
 
     for acc_key, numbers in plan.items():
         report.extend(_upload_account(conn, settings, pool, settings.accounts[acc_key], numbers))
@@ -103,7 +106,7 @@ def upload_all(conn: sqlite3.Connection, settings: Settings, pool: MetaPool) -> 
         signature = ",".join(sorted(empty))
         if db.get_kv(conn, key) != signature:
             report.append(f"⚠️ {len(empty)} número(s) parado(s) sem criativo novo pra testar: "
-                          f"{', '.join(empty)}. Manda mais criativos no grupo.")
+                          f"{', '.join(empty)}. Manda mais criativos pelo painel ou pelo grupo.")
             if not pool.dry_run:
                 db.set_kv(conn, key, signature)
     return report

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Enviar · Noryx{% endblock %}
+{% block head %}
+<style>
+  .drop { display: block; border: 2px dashed var(--line); border-radius: 14px; padding: 28px 16px;
+          text-align: center; cursor: pointer; background: var(--card); }
+  .drop.over { border-color: var(--accent); }
+  .drop b { display: block; font-size: 18px; margin-bottom: 4px; }
+  #files li { display: block; }
+  .row { display: flex; justify-content: space-between; gap: 12px; }
+  .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar { height: 6px; background: var(--line); border-radius: 99px; margin-top: 8px; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+  .done .bar i { background: var(--ok); } .fail .bar i { background: var(--bad); }
+  .fail .st { color: var(--bad); } .done .st { color: var(--ok); }
+</style>
+{% endblock %}
+{% block body %}
+<h1 style="margin:0 0 6px;font-size:24px">Enviar criativos</h1>
+<p class="muted" style="margin:0 0 16px">Os vídeos vão para o banco e entram nos números que ficarem sem anúncio ativo.</p>
+
+<form id="form">
+  {% if products|length > 1 %}
+  <label for="product">Produto</label>
+  <select id="product">
+    {% for p in products %}<option value="{{ p }}" {% if p == default_product %}selected{% endif %}>{{ p }}</option>{% endfor %}
+  </select>
+  {% else %}
+  <input type="hidden" id="product" value="{{ default_product }}">
+  {% endif %}
+
+  <label for="variant">Descrição <span class="muted">(opcional)</span></label>
+  <input id="variant" type="text" placeholder="ex.: gancho final, versão 2" maxlength="120">
+
+  <label>Vídeos</label>
+  <label class="drop" id="drop" for="picker">
+    <b>Toque para escolher os vídeos</b>
+    <span class="muted">MP4 ou MOV, até {{ max_label }} cada. Pode escolher vários.</span>
+  </label>
+  <input id="picker" type="file" accept="video/*" multiple hidden>
+
+  <div class="card" id="queue" style="margin-top:14px;display:none"><ul class="list" id="files"></ul></div>
+  <div style="height:16px"></div>
+  <button class="btn" id="send" type="submit" disabled>Enviar</button>
+</form>
+
+<script>
+const picker = document.getElementById('picker'), drop = document.getElementById('drop');
+const list = document.getElementById('files'), queue = document.getElementById('queue');
+const sendBtn = document.getElementById('send');
+let files = [];
+
+function render() {
+  queue.style.display = files.length ? 'block' : 'none';
+  list.innerHTML = '';
+  files.forEach(f => {
+    const li = document.createElement('li');
+    li.innerHTML = '<div class="row"><span class="name"></span><span class="st muted"></span></div><div class="bar"><i></i></div>';
+    li.querySelector('.name').textContent = f.file.name;
+    li.querySelector('.st').textContent = f.status;
+    li.querySelector('.bar i').style.width = f.pct + '%';
+    if (f.state) li.classList.add(f.state);
+    list.appendChild(li);
+  });
+  sendBtn.disabled = !files.some(f => !f.state);
+}
+function add(fileList) {
+  for (const file of fileList) files.push({file, pct: 0, status: (file.size / 1048576).toFixed(1) + ' MB', state: ''});
+  render();
+}
+picker.addEventListener('change', e => { add(e.target.files); picker.value = ''; });
+['dragover','dragenter'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => add(e.dataTransfer.files));
+
+function upload(item) {
+  return new Promise(resolve => {
+    const fd = new FormData();
+    fd.append('video', item.file);
+    fd.append('product', document.getElementById('product').value);
+    fd.append('variant', document.getElementById('variant').value);
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/enviar');
+    xhr.upload.onprogress = e => { if (e.lengthComputable) { item.pct = Math.round(e.loaded / e.total * 100); item.status = item.pct + '%'; render(); } };
+    xhr.onload = () => {
+      let r = {}; try { r = JSON.parse(xhr.responseText); } catch (_) {}
+      if (xhr.status === 200 && r.ok) { item.state = 'done'; item.pct = 100; item.status = 'No banco · #' + r.id; }
+      else { item.state = 'fail'; item.status = r.error || 'Erro ao enviar'; }
+      render(); resolve();
+    };
+    xhr.onerror = () => { item.state = 'fail'; item.status = 'Sem conexão'; render(); resolve(); };
+    xhr.send(fd);
+  });
+}
+document.getElementById('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  sendBtn.disabled = true; sendBtn.textContent = 'Enviando…';
+  for (const item of files.filter(f => !f.state)) await upload(item);
+  sendBtn.textContent = 'Enviar';
+  render();
+});
+</script>
+{% endblock %}
