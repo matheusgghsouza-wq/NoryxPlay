@@ -11,7 +11,8 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { aberturaBoca, LegendaPalavra, Legendas } from "./Legendas";
+import boca from "./boca.json";
+import { LegendaPalavra, Legendas } from "./Legendas";
 
 type Props = {
   capa: string;
@@ -24,40 +25,39 @@ type Props = {
   inicioCtaSegundos: number;
 };
 
-// Tempos estimados da fala (~11,5 s). Quando chegar o áudio real, ajuste aqui
-// (ou transcreva com Whisper e cole o resultado).
+// Tempos sincronizados com public/voz.wav (gerado por scripts/voz.py).
 const LEGENDAS: LegendaPalavra[] = [
-  { text: "Ai,", startMs: 300, endMs: 550, timestampMs: 400, confidence: null },
-  { text: " gente,", startMs: 550, endMs: 950, timestampMs: 700, confidence: null },
-  { text: " olha", startMs: 1050, endMs: 1300, timestampMs: 1150, confidence: null },
-  { text: " só", startMs: 1300, endMs: 1500, timestampMs: 1400, confidence: null },
-  { text: " essa", startMs: 1500, endMs: 1750, timestampMs: 1600, confidence: null },
-  { text: " novelinha!", startMs: 1750, endMs: 2500, timestampMs: 2000, confidence: null, pageBreakAfter: true },
-  { text: "Sabe", startMs: 2700, endMs: 2950, timestampMs: 2800, confidence: null },
-  { text: " aquele", startMs: 2950, endMs: 3250, timestampMs: 3100, confidence: null },
-  { text: " dorama", startMs: 3250, endMs: 3650, timestampMs: 3400, confidence: null },
-  { text: " que", startMs: 3650, endMs: 3800, timestampMs: 3700, confidence: null, pageBreakAfter: true },
-  { text: "você", startMs: 3800, endMs: 4050, timestampMs: 3900, confidence: null },
-  { text: " começa", startMs: 4050, endMs: 4400, timestampMs: 4200, confidence: null },
-  { text: " dizendo", startMs: 4400, endMs: 4800, timestampMs: 4600, confidence: null },
-  { text: " ‘só", startMs: 4800, endMs: 5100, timestampMs: 4900, confidence: null },
-  { text: " um", startMs: 5100, endMs: 5250, timestampMs: 5150, confidence: null },
-  { text: " episódio’?", startMs: 5250, endMs: 5800, timestampMs: 5400, confidence: null, pageBreakAfter: true },
-  { text: "Pois", startMs: 6000, endMs: 6250, timestampMs: 6100, confidence: null },
-  { text: " é…", startMs: 6250, endMs: 6900, timestampMs: 6400, confidence: null, pageBreakAfter: true },
-  { text: "Já", startMs: 7000, endMs: 7200, timestampMs: 7100, confidence: null },
-  { text: " coloca", startMs: 7200, endMs: 7550, timestampMs: 7350, confidence: null },
-  { text: " na", startMs: 7550, endMs: 7680, timestampMs: 7600, confidence: null },
-  { text: " sua", startMs: 7680, endMs: 7900, timestampMs: 7750, confidence: null },
-  { text: " lista.", startMs: 7900, endMs: 8500, timestampMs: 8100, confidence: null, pageBreakAfter: true },
-  { text: "Quer", startMs: 8700, endMs: 8900, timestampMs: 8800, confidence: null },
-  { text: " ver", startMs: 8900, endMs: 9100, timestampMs: 9000, confidence: null },
-  { text: " qual", startMs: 9100, endMs: 9350, timestampMs: 9200, confidence: null },
-  { text: " é?", startMs: 9350, endMs: 9800, timestampMs: 9500, confidence: null, pageBreakAfter: true },
-  { text: "Clique", startMs: 9950, endMs: 10300, timestampMs: 10100, confidence: null },
-  { text: " no", startMs: 10300, endMs: 10450, timestampMs: 10350, confidence: null },
-  { text: " botão", startMs: 10450, endMs: 10800, timestampMs: 10600, confidence: null },
-  { text: " abaixo!", startMs: 10800, endMs: 11500, timestampMs: 11000, confidence: null },
+  { text: "Ai,", startMs: 300, endMs: 619, timestampMs: 459, confidence: null },
+  { text: " gente,", startMs: 619, endMs: 937, timestampMs: 778, confidence: null },
+  { text: " olha", startMs: 937, endMs: 1256, timestampMs: 1096, confidence: null },
+  { text: " só", startMs: 1256, endMs: 1415, timestampMs: 1335, confidence: null },
+  { text: " essa", startMs: 1415, endMs: 1733, timestampMs: 1574, confidence: null },
+  { text: " novelinha!", startMs: 1733, endMs: 2370, timestampMs: 2052, confidence: null, pageBreakAfter: true },
+  { text: "Sabe", startMs: 2620, endMs: 2883, timestampMs: 2752, confidence: null },
+  { text: " aquele", startMs: 2883, endMs: 3407, timestampMs: 3145, confidence: null },
+  { text: " dorama", startMs: 3407, endMs: 3800, timestampMs: 3604, confidence: null },
+  { text: " que", startMs: 3800, endMs: 4062, timestampMs: 3931, confidence: null, pageBreakAfter: true },
+  { text: "você", startMs: 4062, endMs: 4325, timestampMs: 4193, confidence: null },
+  { text: " começa", startMs: 4325, endMs: 4718, timestampMs: 4521, confidence: null },
+  { text: " dizendo", startMs: 4718, endMs: 5111, timestampMs: 4914, confidence: null },
+  { text: " ‘só", startMs: 5111, endMs: 5242, timestampMs: 5177, confidence: null },
+  { text: " um", startMs: 5242, endMs: 5373, timestampMs: 5308, confidence: null },
+  { text: " episódio’?", startMs: 5373, endMs: 6029, timestampMs: 5701, confidence: null, pageBreakAfter: true },
+  { text: "Pois", startMs: 6229, endMs: 6633, timestampMs: 6431, confidence: null },
+  { text: " é…", startMs: 6633, endMs: 6835, timestampMs: 6734, confidence: null, pageBreakAfter: true },
+  { text: "Já", startMs: 6985, endMs: 7157, timestampMs: 7071, confidence: null },
+  { text: " coloca", startMs: 7157, endMs: 7672, timestampMs: 7415, confidence: null },
+  { text: " na", startMs: 7672, endMs: 7844, timestampMs: 7758, confidence: null },
+  { text: " sua", startMs: 7844, endMs: 8188, timestampMs: 8016, confidence: null },
+  { text: " lista.", startMs: 8188, endMs: 8531, timestampMs: 8360, confidence: null, pageBreakAfter: true },
+  { text: "Quer", startMs: 8781, endMs: 9109, timestampMs: 8945, confidence: null },
+  { text: " ver", startMs: 9109, endMs: 9273, timestampMs: 9191, confidence: null },
+  { text: " qual", startMs: 9273, endMs: 9601, timestampMs: 9437, confidence: null },
+  { text: " é?", startMs: 9601, endMs: 9764, timestampMs: 9683, confidence: null, pageBreakAfter: true },
+  { text: "Clique", startMs: 9914, endMs: 10322, timestampMs: 10118, confidence: null },
+  { text: " no", startMs: 10322, endMs: 10458, timestampMs: 10390, confidence: null },
+  { text: " botão", startMs: 10458, endMs: 10865, timestampMs: 10662, confidence: null },
+  { text: " abaixo!", startMs: 10865, endMs: 11409, timestampMs: 11137, confidence: null, pageBreakAfter: true },
 ];
 
 // Dimensões da capa original (1086 × 1448) e a faixa onde está o título.
@@ -131,12 +131,11 @@ const Titulo: React.FC<{ capa: string }> = ({ capa }) => {
   );
 };
 
-/** Apresentadora provisória: ilustração simples com boca sincronizada às legendas. */
+/** Apresentadora provisória: ilustração simples com boca sincronizada à voz. */
 const ApresentadoraProvisoria: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const ms = (frame / fps) * 1000;
-  const boca = aberturaBoca(LEGENDAS, ms);
+  // Abertura da boca vem do volume real da voz, quadro a quadro.
+  const bocaAgora = Math.min(1, ((boca as number[])[frame] ?? 0) * 1.3);
   const piscando = frame % 96 < 4;
   const balanco = Math.sin(frame / 18) * 4;
   const inclinacao = Math.sin(frame / 27) * 1.5;
@@ -189,7 +188,7 @@ const ApresentadoraProvisoria: React.FC = () => {
         <ellipse cx="550" cy="470" rx="30" ry="16" fill="#f29c9c" opacity="0.45" />
         {/* boca: sorriso leve + abertura sincronizada */}
         <path
-          d={`M400 505 Q450 ${525 + boca * 10} 500 505 Q450 ${530 + boca * 42} 400 505 Z`}
+          d={`M400 505 Q450 ${525 + bocaAgora * 10} 500 505 Q450 ${530 + bocaAgora * 42} 400 505 Z`}
           fill="#7a2230"
         />
         <path d="M398 504 Q450 518 502 504" stroke="#b5475a" strokeWidth="6" fill="none" strokeLinecap="round" />

@@ -13,10 +13,10 @@ export const RemotionRoot: React.FC = () => {
       defaultProps={{
         capa: "capa.jpg",
         apresentadoraVideo: "",
-        voz: "",
+        voz: "voz.wav",
         textoCta: "Clique no botão abaixo",
         seloIa: "Apresentadora gerada por IA",
-        inicioCtaSegundos: 9.8,
+        inicioCtaSegundos: 9.9,
       }}
     />
   );
