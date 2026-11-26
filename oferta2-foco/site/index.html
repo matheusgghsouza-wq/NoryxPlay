@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Foco sem Tela</title>
+<meta name="description" content="102 atividades de atenção para imprimir, para crianças de 4 a 10 anos. 10 minutos por dia, sem tela.">
+<meta property="og:title" content="Kit Foco sem Tela"><meta property="og:image" content="img/0-capa.jpg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: loja de produto digital — topo com galeria e compra, depois blocos visuais alternados, oferta final e rodapé. */
+:root {
+  --tinta:#1b2232; --texto:#3a4354; --suave:#6a7384; --fundo:#ffffff; --creme:#fff8ee; --areia:#f6efe3; --linha:#ebe3d5;
+  --cta:#e4572e; --cta2:#b9401d; --r:#e4572e; --a:#f2a516; --v:#25a065; --az:#2b7fd6; --rx:#8b46b0; --rosa:#e2f4ea;
+  --f-tit:'Baloo 2', 'Trebuchet MS', system-ui, sans-serif; --f-txt:'Nunito', system-ui, sans-serif; color-scheme: light;
+}
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } }
+body { margin:0; background:var(--fundo); color:var(--tinta); font-family:var(--f-txt); font-size:16px; line-height:1.55; }
+h1,h2,h3 { font-family:var(--f-tit); line-height:1.12; margin:0; text-wrap:balance; color:var(--tinta); }
+p { margin:0; }
+img { max-width:100%; }
+.w { max-width:1140px; margin:0 auto; padding-left:max(18px, env(safe-area-inset-left, 0px)); padding-right:max(18px, env(safe-area-inset-right, 0px)); }
+.eyebrow { font-weight:800; font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--cta); }
+.sec { padding-block:72px; }
+.sec-head { max-width:680px; margin:0 auto 40px; text-align:center; display:flex; flex-direction:column; gap:10px; }
+.sec-head h2 { font-size:clamp(28px,4vw,42px); }
+.sec-head p { color:var(--texto); font-size:18px; }
+
+/* Topo */
+.aviso { background:var(--tinta); color:#fff; text-align:center; font-weight:700; font-size:13.5px; padding-block:9px; }
+header { border-bottom:1px solid var(--linha); background:#fff; position:sticky; top:env(safe-area-inset-top, 0px); z-index:20; }
+body::before { content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top, 0px); background:#fff; z-index:21; }
+header .w { display:flex; align-items:center; justify-content:space-between; gap:16px; padding-block:12px; }
+.logo { display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--tinta); }
+.logo svg { width:38px; height:38px; flex:none; }
+.logo b { font-family:var(--f-tit); font-weight:800; font-size:23px; line-height:1; display:block; }
+.logo small { display:block; font-size:11px; font-weight:800; letter-spacing:.14em; color:var(--suave); text-transform:uppercase; }
+nav { display:flex; gap:26px; align-items:center; font-weight:700; font-size:15px; }
+nav a { color:var(--texto); text-decoration:none; }
+nav a:hover { color:var(--cta); }
+nav .mini-cta { background:var(--cta); color:#fff; padding:9px 16px; border-radius:10px; }
+nav .mini-cta:hover { color:#fff; background:var(--cta2); }
+.faixa { background:var(--rosa); font-size:14px; }
+.faixa .w { display:flex; flex-wrap:wrap; justify-content:center; gap:6px 30px; padding-block:9px; }
+
+/* Produto */
+.produto { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); gap:48px; padding-block:34px 56px; }
+.principal { position:relative; border-radius:16px; overflow:hidden; background:var(--areia); aspect-ratio:1; }
+.principal img { width:100%; height:100%; object-fit:cover; display:block; }
+.seta { position:absolute; top:50%; transform:translateY(-50%); width:44px; height:44px; border-radius:50%; border:0; background:rgba(255,255,255,.95); box-shadow:0 2px 10px rgba(0,0,0,.18); font-size:22px; cursor:pointer; color:var(--tinta); }
+.seta.esq { left:12px; } .seta.dir { right:12px; }
+.miniaturas { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:8px; margin-top:10px; }
+.miniaturas button { padding:0; border:2px solid transparent; border-radius:9px; overflow:hidden; cursor:pointer; background:none; aspect-ratio:1; }
+.miniaturas button[aria-current="true"] { border-color:var(--cta); }
+.miniaturas img { width:100%; height:100%; object-fit:cover; display:block; }
+.info { display:flex; flex-direction:column; gap:14px; }
+.lanc { align-self:flex-start; background:var(--creme); border:1px solid var(--linha); color:var(--cta2); font-weight:800; font-size:13px; border-radius:30px; padding:4px 12px; }
+.info h1 { font-size:clamp(28px,3.4vw,40px); }
+.info .resumo { color:var(--texto); font-size:17px; }
+.precos { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+.de { color:var(--suave); text-decoration:line-through; font-size:20px; }
+.por { font-family:var(--f-tit); font-size:50px; font-weight:800; line-height:1; }
+.off { background:var(--v); color:#fff; font-weight:800; font-size:14px; border-radius:6px; padding:3px 9px; }
+.pag { font-size:14px; color:var(--suave); margin-top:-6px; }
+.btn { display:block; text-align:center; background:var(--cta); color:#fff; font-weight:800; font-size:20px; text-decoration:none; padding:18px 22px; border-radius:12px; box-shadow:0 5px 0 var(--cta2); transition:transform .08s; }
+.btn:hover { background:#ea6338; }
+.btn:active { transform:translateY(2px); box-shadow:0 3px 0 var(--cta2); }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline:3px solid var(--az); outline-offset:3px; }
+.pagamentos { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; align-items:center; font-size:13px; color:var(--suave); }
+.pagamentos span.pg { border:1px solid var(--linha); border-radius:6px; padding:3px 9px; font-weight:800; font-size:12px; color:var(--texto); background:#fff; }
+.icones { display:grid; grid-template-columns:1fr 1fr; gap:12px 18px; padding-top:6px; border-top:1px solid var(--linha); }
+.icones div { display:flex; gap:10px; align-items:center; font-size:15px; font-weight:700; color:var(--texto); padding-top:10px; }
+.icones svg { flex:none; width:32px; height:32px; }
+
+/* Números */
+.numeros { background:var(--tinta); color:#fff; }
+.numeros .w { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:20px; padding-block:34px; text-align:center; }
+.numeros b { display:block; font-family:var(--f-tit); font-size:44px; line-height:1; color:var(--a); }
+.numeros span { font-size:15px; color:#d6dbe4; font-weight:600; }
+
+/* Zigue-zague */
+.zz { display:flex; flex-direction:column; gap:64px; }
+.linha-zz { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:56px; align-items:center; }
+.linha-zz.inv .foto { order:2; }
+.linha-zz .foto img { width:100%; border-radius:18px; display:block; box-shadow:0 20px 40px rgba(27,34,50,.14); }
+.linha-zz .txt { display:flex; flex-direction:column; gap:14px; }
+.linha-zz h3 { font-size:clamp(24px,3vw,32px); }
+.linha-zz p { color:var(--texto); font-size:17px; }
+.check { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; }
+.check li { padding-left:30px; position:relative; color:var(--texto); }
+.check li::before { content:""; position:absolute; left:0; top:3px; width:20px; height:20px; border-radius:50%; background:var(--v) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5.5 10.5l3 3 6-7' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/16px no-repeat; }
+
+/* Anos */
+.bg-areia { background:var(--creme); }
+.anos { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:14px; }
+.tipos { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:14px; }
+.tipo { background:#fff; border:1px solid var(--linha); border-radius:16px; padding:18px 16px; display:flex; flex-direction:column; gap:6px; border-top:6px solid var(--c); }
+.tipo h3 { font-size:19px; }
+.tipo p { font-size:14.5px; color:var(--texto); }
+.bump { display:grid; grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr); gap:40px; align-items:center; border:2px dashed var(--rx); border-radius:22px; padding:28px; background:#fff; }
+.bump img { width:100%; border-radius:14px; display:block; }
+.bump .tag { align-self:flex-start; background:var(--rx); color:#fff; font-weight:800; font-size:13px; border-radius:30px; padding:4px 12px; }
+.bump .txt { display:flex; flex-direction:column; gap:12px; }
+.bump h3 { font-size:clamp(24px,3vw,32px); }
+.nota { font-size:13.5px; color:var(--suave); }
+@media (max-width:980px) { .tipos { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:860px) { .bump { grid-template-columns:minmax(0,1fr); padding:20px; } }
+.ano { background:#fff; border-radius:16px; overflow:hidden; border:1px solid var(--linha); display:flex; flex-direction:column; }
+.ano .topo { background:var(--c); color:#fff; padding:14px 16px; }
+.ano .topo b { font-family:var(--f-tit); font-size:28px; line-height:1; display:block; }
+.ano .topo span { font-size:13px; font-weight:700; opacity:.92; }
+.ano ul { list-style:none; margin:0; padding:14px 16px 18px; display:flex; flex-direction:column; gap:7px; font-size:14.5px; color:var(--texto); }
+.ano li { padding-left:14px; position:relative; }
+.ano li::before { content:""; position:absolute; left:0; top:9px; width:6px; height:6px; border-radius:50%; background:var(--c); }
+
+/* Passos */
+.passos { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:22px; counter-reset:p; }
+.passo { border:1px solid var(--linha); border-radius:16px; padding:26px 22px; display:flex; flex-direction:column; gap:8px; }
+.passo .n { width:44px; height:44px; border-radius:12px; background:var(--cta); color:#fff; font-family:var(--f-tit); font-weight:800; font-size:24px; display:flex; align-items:center; justify-content:center; }
+.passo h3 { font-size:21px; }
+.passo p { color:var(--texto); }
+
+/* Público */
+.publico { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:22px; }
+.card-p { background:#fff; border-radius:16px; padding:26px 22px; border:1px solid var(--linha); display:flex; flex-direction:column; gap:8px; }
+.card-p svg { width:46px; height:46px; }
+.card-p h3 { font-size:21px; }
+.card-p p { color:var(--texto); }
+
+/* Oferta */
+.oferta { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); border-radius:22px; overflow:hidden; border:2px solid var(--tinta); box-shadow:0 24px 50px rgba(27,34,50,.16); }
+.oferta .foto { background:var(--areia); display:flex; align-items:center; }
+.oferta .foto img { width:100%; height:auto; display:block; }
+.oferta .box { padding:38px 36px; display:flex; flex-direction:column; gap:16px; background:#fff; }
+.oferta h2 { font-size:clamp(26px,3.2vw,36px); }
+.selo { display:flex; gap:14px; align-items:center; background:var(--creme); border-radius:14px; padding:14px 16px; }
+.selo svg { width:56px; height:56px; flex:none; }
+.selo p { font-size:14.5px; color:var(--texto); }
+
+/* FAQ */
+.faq { max-width:780px; margin:0 auto; display:flex; flex-direction:column; gap:10px; }
+details { border:1px solid var(--linha); border-radius:14px; padding:0 20px; background:#fff; }
+summary { list-style:none; cursor:pointer; font-weight:800; font-size:17px; padding-block:18px; display:flex; justify-content:space-between; gap:14px; }
+summary::-webkit-details-marker { display:none; }
+summary::after { content:"+"; font-family:var(--f-tit); font-size:24px; line-height:1; color:var(--cta); }
+details[open] summary::after { content:"−"; }
+details p { color:var(--texto); padding-bottom:18px; }
+
+/* Rodapé */
+footer { background:var(--tinta); color:#c5ccd8; padding-block:44px 100px; font-size:14px; }
+footer .w { display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:28px; }
+footer h4 { color:#fff; margin:0 0 10px; font-size:15px; }
+footer a { color:#c5ccd8; text-decoration:none; display:block; margin-bottom:6px; }
+footer .base { grid-column:1/-1; border-top:1px solid #2f3850; padding-top:18px; font-size:12.5px; color:#8f98aa; }
+
+.fixo { position:fixed; left:0; right:0; bottom:0; background:#fff; border-top:1px solid var(--linha); box-shadow:0 -6px 18px rgba(0,0,0,.08); padding:10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); display:none; align-items:center; gap:12px; z-index:30; }
+.fixo .p { font-family:var(--f-tit); font-weight:800; font-size:24px; line-height:1; white-space:nowrap; }
+.fixo .p small { display:block; font-family:var(--f-txt); font-size:12px; color:var(--suave); text-decoration:line-through; font-weight:600; }
+.fixo .btn { flex:1; padding:13px 16px; font-size:17px; }
+
+@media (max-width:980px) { .anos { grid-template-columns:repeat(2,minmax(0,1fr)); } .anos .ano:last-child { grid-column:1/-1; } }
+@media (max-width:860px) {
+  nav a:not(.mini-cta) { display:none; }
+  .produto { grid-template-columns:minmax(0,1fr); gap:24px; padding-top:16px; }
+  .numeros .w { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .linha-zz, .oferta { grid-template-columns:minmax(0,1fr); gap:24px; }
+  .linha-zz.inv .foto { order:0; }
+  .passos, .publico { grid-template-columns:minmax(0,1fr); }
+  .oferta .box { padding:26px 20px; }
+  footer .w { grid-template-columns:minmax(0,1fr); }
+  .faixa .w { justify-content:flex-start; overflow-x:auto; flex-wrap:nowrap; white-space:nowrap; }
+  .fixo { display:flex; }
+  .sec { padding-block:52px; }
+}
+@media (max-width:520px) { .anos { grid-template-columns:minmax(0,1fr); } .miniaturas { grid-template-columns:repeat(4,minmax(0,1fr)); } }
+</style>
+<!-- Meta Pixel: cole o ID do seu pixel em PIXEL_ID (só números). Vazio = pixel desligado. -->
+<script>
+(function () {
+  var PIXEL_ID = '';
+  if (!PIXEL_ID) return;
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', PIXEL_ID);
+  fbq('track', 'PageView');
+  fbq('track', 'ViewContent', { content_name: document.title, currency: 'BRL', value: 19.90 });
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a.btn');
+    if (a) fbq('track', 'InitiateCheckout', { currency: 'BRL', value: 19.90 });
+  });
+})();
+</script>
+</head><body>
+<div class="aviso">Produto 100% digital · Você recebe o PDF no seu e-mail logo após a compra</div>
+<header><div class="w">
+  <a class="logo" href="#topo" aria-label="Foco sem Tela, início">
+    <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#25a065"/><circle cx="20" cy="20" r="11" fill="#fff"/><circle cx="20" cy="20" r="5" fill="#e4572e"/></svg>
+    <span><b>Foco sem Tela</b><small>10 minutos por dia</small></span>
+  </a>
+  <nav><a href="#por-dentro">O que vem</a><a href="#como-funciona">Como funciona</a><a href="#duvidas">Dúvidas</a><a class="mini-cta" href="#comprar">Comprar</a></nav>
+</div></header>
+<div class="faixa" id="topo"><div class="w"><span><b>102</b> atividades</span><span><b>24</b> cartões de movimento</span><span><b>4 a 10</b> anos</span><span><b>2</b> níveis</span><span>Plano de <b>4 semanas</b></span></div></div>
+
+<main>
+<section class="w produto">
+  <div>
+    <div class="principal">
+      <img id="foto" src="img/0-capa.jpg" alt="Kit Foco sem Tela com páginas de atividades coloridas">
+      <button class="seta esq" id="ant" type="button" aria-label="Foto anterior">‹</button>
+      <button class="seta dir" id="prox" type="button" aria-label="Próxima foto">›</button>
+    </div>
+    <div class="miniaturas" id="minis"><button type="button" aria-current="true" data-src="img/0-capa.jpg" data-alt="Kit Foco sem Tela com páginas de atividades coloridas"><img src="img/0-capa.jpg" alt=""></button><button type="button" data-src="img/1-por-dentro.jpg" data-alt="Seis tipos de atividade: caça-símbolos, labirinto, sequências, encontre o igual, conte e registre, siga as setas"><img src="img/1-por-dentro.jpg" alt=""></button><button type="button" data-src="img/2-niveis.jpg" data-alt="Mesma atividade em dois níveis: 4 a 6 anos e 7 a 10 anos"><img src="img/2-niveis.jpg" alt=""></button><button type="button" data-src="img/3-cartoes.jpg" data-alt="Cartões de foco em movimento para recortar"><img src="img/3-cartoes.jpg" alt=""></button><button type="button" data-src="img/4-plano.jpg" data-alt="Plano de 4 semanas e quadro de conquistas"><img src="img/4-plano.jpg" alt=""></button><button type="button" data-src="img/5-imprima.jpg" data-alt="Folha de atividade em saquinho plástico para reutilizar"><img src="img/5-imprima.jpg" alt=""></button><button type="button" data-src="img/6-emocoes.jpg" data-alt="Kit adicional Emoções em Jogo"><img src="img/6-emocoes.jpg" alt=""></button></div>
+  </div>
+  <div class="info">
+    <span class="lanc">Preço de lançamento</span>
+    <h1>Kit Foco sem Tela: 102 atividades de atenção para imprimir</h1>
+    <p class="resumo">10 minutos por dia de labirintos, caça-símbolos, memória e sequências para crianças de 4 a 10 anos. Imprimiu, brincou. Sem celular, sem tablet.</p>
+    <div class="precos"><span class="de">R$ 47,00</span><span class="por">R$ 19,90</span><span class="off">Economize 58%</span></div>
+    <p class="pag">Pagamento único. Sem mensalidade.</p>
+    <a class="btn" href="https://LINK-DO-SEU-CHECKOUT">Quero o kit agora</a>
+    <div class="pagamentos"><span>Pague com</span><span class="pg">PIX</span><span class="pg">VISA</span><span class="pg">MASTERCARD</span><span class="pg">ELO</span><span class="pg">BOLETO</span></div>
+    <div class="icones">
+      <div><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#f1e7f7"/><circle cx="16" cy="16" r="8" fill="none" stroke="#8b46b0" stroke-width="2"/><path d="M16 11v5l3 2" fill="none" stroke="#8b46b0" stroke-width="2.4" stroke-linecap="round"/></svg>10 minutos por dia</div>
+      <div><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#e4f4ec"/><path d="M9 17l5 5 9-11" fill="none" stroke="#25a065" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Sem tela</div>
+      <div><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#e6f0fb"/><path d="M16 8v12m-5-5 5 5 5-5M10 24h12" fill="none" stroke="#2b7fd6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Download na hora</div>
+      <div><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#fff3da"/><path d="M10 13h12v8H10zM12 13V8h8v5M12 19h8v5h-8z" fill="#fff" stroke="#c98a00" stroke-width="2" stroke-linejoin="round"/></svg>Imprima à vontade</div>
+      <div><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#fde9ef"/><path d="M10 22V12l6-3 6 3v10" fill="none" stroke="#e4572e" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 22v-5h4v5" fill="none" stroke="#e4572e" stroke-width="2.2"/></svg>Para casa ou escola</div>
+      <div><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#e4f4ec"/><path d="M16 7l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9v-6z" fill="#fff" stroke="#25a065" stroke-width="2" stroke-linejoin="round"/><path d="M12.5 16l2.5 2.5 4.5-5" fill="none" stroke="#25a065" stroke-width="2.2" stroke-linecap="round"/></svg>Garantia de 7 dias</div>
+    </div>
+  </div>
+</section>
+
+<section class="numeros" aria-label="O kit em números"><div class="w">
+  <div><b>102</b><span>atividades de papel</span></div>
+  <div><b>24</b><span>cartões de movimento</span></div>
+  <div><b>10</b><span>tipos de desafio</span></div>
+  <div><b>10 min</b><span>por dia é o bastante</span></div>
+</div></section>
+
+<section class="sec" id="por-dentro"><div class="w">
+  <div class="sec-head"><span class="eyebrow">O que vem no kit</span><h2>Um momento de foco por dia, sem briga e sem tela</h2><p>Atividades curtas, coloridas e com cara de brincadeira, para a criança treinar a atenção enquanto se diverte.</p></div>
+  <div class="zz">
+    <div class="linha-zz">
+      <div class="foto"><img src="img/1-por-dentro.jpg" alt="Seis tipos de atividade: caça-símbolos, labirinto, sequências, encontre o igual, conte e registre, siga as setas" loading="lazy"></div>
+      <div class="txt"><h3>10 tipos de desafio para não enjoar</h3><p>Cada dia uma brincadeira diferente: hoje labirinto, amanhã caça-símbolos, depois memória.</p>
+        <ul class="check"><li>Cada folha leva de 3 a 10 minutos</li><li>Instrução curta no topo, fácil de entender</li><li>Espaço para nome e data em todas as folhas</li></ul></div>
+    </div>
+    <div class="linha-zz inv">
+      <div class="foto"><img src="img/2-niveis.jpg" alt="Mesma atividade em dois níveis: 4 a 6 anos e 7 a 10 anos" loading="lazy"></div>
+      <div class="txt"><h3>Dois níveis: cresce junto com a criança</h3><p>O Nível 1 é para 4 a 6 anos. O Nível 2 traz grades maiores e desafios mais longos para 7 a 10 anos.</p>
+        <ul class="check"><li>Irmãos de idades diferentes podem usar o mesmo kit</li><li>Ficou fácil? É só passar para o próximo nível</li></ul></div>
+    </div>
+    <div class="linha-zz">
+      <div class="foto"><img src="img/3-cartoes.jpg" alt="Cartões de foco em movimento para recortar" loading="lazy"></div>
+      <div class="txt"><h3>24 cartões de foco em movimento</h3><p>Estátua, flamingo, palma secreta, respiração da flor. Desafios para o corpo que pedem atenção e controle.</p>
+        <ul class="check"><li>Recorte e sorteie um por dia</li><li>Ótimos para gastar energia antes da folha</li></ul></div>
+    </div>
+    <div class="linha-zz inv">
+      <div class="foto"><img src="img/4-plano.jpg" alt="Plano de 4 semanas e quadro de conquistas" loading="lazy"></div>
+      <div class="txt"><h3>Plano de 4 semanas pronto</h3><p>Você não precisa pensar no que fazer: o plano diz a folha e o cartão de cada dia.</p>
+        <ul class="check"><li>Quadro de conquistas com 30 dias para pintar</li><li>Certificado de foco para comemorar</li><li>Gabarito das atividades com resposta</li></ul></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec bg-areia"><div class="w">
+  <div class="sec-head"><span class="eyebrow">Conteúdo</span><h2>Os 10 tipos de atividade</h2></div>
+  <div class="tipos"><div class="tipo" style="--c:#e4572e"><h3>Caça-símbolos</h3><p>Achar o alvo no meio de muitos desenhos, letras e números.</p><p><b>12 atividades</b></p></div><div class="tipo" style="--c:#2b7fd6"><h3>Labirintos</h3><p>Planejar o caminho antes de riscar.</p><p><b>12 atividades</b></p></div><div class="tipo" style="--c:#25a065"><h3>Trilha dos números</h3><p>Seguir a ordem sem se perder: 1, 2, 3… e 1-A-2-B.</p><p><b>10 atividades</b></p></div><div class="tipo" style="--c:#8b46b0"><h3>Copie o desenho</h3><p>Observar o modelo e reproduzir na grade de pontos.</p><p><b>12 atividades</b></p></div><div class="tipo" style="--c:#e0930c"><h3>Sequências</h3><p>Descobrir a regra e prever o que vem depois.</p><p><b>10 atividades</b></p></div><div class="tipo" style="--c:#d6457a"><h3>Encontre o igual</h3><p>Comparar com cuidado, desenho por desenho.</p><p><b>10 atividades</b></p></div><div class="tipo" style="--c:#14918f"><h3>Jogo das diferenças</h3><p>Olhar atento, parte por parte.</p><p><b>10 atividades</b></p></div><div class="tipo" style="--c:#5a5fd1"><h3>Observe e lembre</h3><p>Guardar uma imagem na memória por 30 segundos.</p><p><b>8 atividades</b></p></div><div class="tipo" style="--c:#c2410c"><h3>Conte e registre</h3><p>Contar sem pular nem repetir.</p><p><b>10 atividades</b></p></div><div class="tipo" style="--c:#3b8f2f"><h3>Siga as setas</h3><p>Seguir instruções passo a passo.</p><p><b>8 atividades</b></p></div></div>
+</div></section>
+
+<section class="sec" id="como-funciona"><div class="w">
+  <div class="sec-head"><span class="eyebrow">Como funciona</span><h2>Do pagamento à mesa da cozinha em minutos</h2></div>
+  <div class="passos">
+    <div class="passo"><div class="n">1</div><h3>Faça o pedido</h3><p>Pague com Pix ou cartão numa página de pagamento segura.</p></div>
+    <div class="passo"><div class="n">2</div><h3>Receba no e-mail</h3><p>O link para baixar o PDF chega logo depois da confirmação do pagamento.</p></div>
+    <div class="passo"><div class="n">3</div><h3>Imprima e brinque</h3><p>Escolha a folha do dia, marque 10 minutos no relógio e pronto.</p></div>
+  </div>
+</div></section>
+
+<section class="sec bg-areia"><div class="w">
+  <div class="sec-head"><span class="eyebrow">Para quem é</span><h2>Para quem quer um tempo de qualidade longe da tela</h2></div>
+  <div class="publico">
+    <div class="card-p"><svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="14" fill="#e4f4ec"/><path d="M24 35s-11-6.5-11-14a6 6 0 0 1 11-3.3A6 6 0 0 1 35 21c0 7.5-11 14-11 14z" fill="none" stroke="#25a065" stroke-width="3" stroke-linejoin="round"/></svg><h3>Mães e pais</h3><p>Uma rotina curta para fazer junto depois da escola, no fim de semana ou nas férias.</p></div>
+    <div class="card-p"><svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="14" fill="#fde9ef"/><path d="M12 32V18l12-6 12 6v14" fill="none" stroke="#e4572e" stroke-width="3" stroke-linejoin="round"/><path d="M19 32v-7h10v7" fill="none" stroke="#e4572e" stroke-width="3" stroke-linejoin="round"/></svg><h3>Professoras</h3><p>Atividades para o começo da aula, para quem termina antes e para os dias agitados.</p></div>
+    <div class="card-p"><svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="14" fill="#e6f0fb"/><circle cx="18" cy="19" r="5" fill="none" stroke="#2b7fd6" stroke-width="3"/><circle cx="31" cy="19" r="5" fill="none" stroke="#2b7fd6" stroke-width="3"/><path d="M10 35c1-5 5-8 8-8s7 3 8 8M23 35c1-5 5-8 8-8s7 3 8 8" fill="none" stroke="#2b7fd6" stroke-width="3" stroke-linecap="round"/></svg><h3>Avós e cuidadores</h3><p>Algo para fazer com a criança que não seja entregar o celular.</p></div>
+  </div>
+</div></section>
+
+<section class="sec"><div class="w">
+  <div class="bump">
+    <img src="img/6-emocoes.jpg" alt="Kit adicional Emoções em Jogo" loading="lazy">
+    <div class="txt"><span class="tag">Oferta adicional no pagamento</span><h3>Kit Emoções em Jogo por R$ 29,90</h3>
+      <p>25 folhas de atividades para a criança dar nome ao que sente e aprender jeitos de se acalmar, mais 12 cartões da calma para recortar.</p>
+      <ul class="check"><li>Termômetro e semáforo das emoções</li><li>Situações do dia a dia para conversar</li><li>Cantinho da calma, diário e jogo da memória</li></ul>
+      <p class="nota">Opcional. Você pode adicionar na página de pagamento, se quiser.</p></div>
+  </div>
+</div></section>
+
+<section class="sec bg-areia" id="comprar"><div class="w">
+  <div class="oferta">
+    <div class="foto"><img src="img/0-capa.jpg" alt="Kit Foco sem Tela" loading="lazy"></div>
+    <div class="box">
+      <span class="eyebrow">Oferta de lançamento</span>
+      <h2>Kit Foco sem Tela</h2>
+      <ul class="check"><li>102 atividades de atenção em 2 níveis</li><li>24 cartões de foco em movimento</li><li>Plano de 4 semanas e quadro de conquistas</li><li>Certificado e gabarito</li><li>Imprima quantas vezes quiser</li></ul>
+      <div class="precos"><span class="de">R$ 47,00</span><span class="por">R$ 19,90</span></div>
+      <a class="btn" href="https://LINK-DO-SEU-CHECKOUT">Quero o kit agora</a>
+      <div class="selo"><svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26" fill="#25a065"/><circle cx="28" cy="28" r="20" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="3 3"/><text x="28" y="31" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="18" fill="#fff">7</text><text x="28" y="41" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="800" font-size="7" fill="#fff">DIAS</text></svg><p><b>Garantia de 7 dias.</b> Se o material não servir para você, peça o reembolso em até 7 dias e receba 100% do valor de volta.</p></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec" id="duvidas"><div class="w">
+  <div class="sec-head"><span class="eyebrow">Dúvidas</span><h2>Perguntas frequentes</h2></div>
+  <div class="faq">
+    <details><summary>Como eu recebo o material?</summary><p>Assim que o pagamento é confirmado, você recebe no seu e-mail o link para baixar o PDF. No Pix, isso leva poucos minutos.</p></details>
+    <details><summary>Para qual idade serve?</summary><p>De 4 a 10 anos. O Nível 1 é para 4 a 6 anos e o Nível 2 para 7 a 10 anos. Crianças que ainda não leem fazem com um adulto lendo a instrução.</p></details>
+    <details><summary>Preciso de impressora colorida?</summary><p>Não. As folhas funcionam em preto e branco. A cor só deixa mais bonito.</p></details>
+    <details><summary>Isso é um tratamento para déficit de atenção?</summary><p>Não. É um material de atividades lúdicas para treinar a atenção em casa ou na escola. Não substitui a avaliação de um profissional de saúde.</p></details>
+    <details><summary>Quanto tempo por dia?</summary><p>A proposta é 10 minutos: uma folha e um cartão de movimento. É melhor pouco todo dia do que muito de vez em quando.</p></details>
+    <details><summary>Posso imprimir quantas vezes quiser?</summary><p>Pode, para os seus filhos ou para a sua turma. Só não é permitido revender nem compartilhar o arquivo.</p></details>
+    <details><summary>E se eu não gostar?</summary><p>Você tem 7 dias de garantia. Peça o reembolso pela plataforma de pagamento ou pelo nosso e-mail e devolvemos 100% do valor.</p></details>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="w">
+  <div><h4>Foco sem Tela</h4><p>Atividades de atenção para imprimir, para crianças de 4 a 10 anos.</p></div>
+  <div><h4>Ajuda</h4><a href="#duvidas">Perguntas frequentes</a><a href="#comprar">Garantia de 7 dias</a><span>Contato: [SEU E-MAIL]</span></div>
+  <div><h4>Informações</h4><span>[SEU NOME OU RAZÃO SOCIAL]</span><br><span>CNPJ/CPF: [SEU DOCUMENTO]</span></div>
+  <div class="base">© 2026 Foco sem Tela. Produto digital, sem envio físico. Material educativo; não é tratamento médico ou psicológico. Este site não é afiliado ao Facebook nem ao Meta.</div>
+</div></footer>
+
+<div class="fixo"><div class="p"><small>R$ 47,00</small>R$ 19,90</div><a class="btn" href="https://LINK-DO-SEU-CHECKOUT">Quero o kit</a></div>
+<script>
+(function () {
+  var minis = Array.prototype.slice.call(document.querySelectorAll('#minis button'));
+  var foto = document.getElementById('foto');
+  var atual = 0;
+  function mostrar(i) {
+    atual = (i + minis.length) % minis.length;
+    foto.src = minis[atual].dataset.src;
+    foto.alt = minis[atual].dataset.alt;
+    minis.forEach(function (b, k) { b.setAttribute('aria-current', String(k === atual)); });
+  }
+  minis.forEach(function (b, k) { b.addEventListener('click', function () { mostrar(k); }); });
+  document.getElementById('ant').addEventListener('click', function () { mostrar(atual - 1); });
+  document.getElementById('prox').addEventListener('click', function () { mostrar(atual + 1); });
+})();
+</script>
+</body></html>

@@ -1,7 +1,10 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Matemática Pronta BNCC</title>
 <meta name="description" content="129 atividades de matemática prontas para imprimir, do 1º ao 5º ano, com o código da BNCC em cada folha e gabarito.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap">
+<meta property="og:title" content="Kit Matemática Pronta BNCC"><meta property="og:image" content="img/0a-capa-foto.jpg">
 <style>
 /* Layout: loja de produto digital — topo com galeria e compra, depois blocos visuais alternados, oferta final e rodapé. */
 :root {
@@ -159,7 +162,22 @@ footer .base { grid-column:1/-1; border-top:1px solid #2f3850; padding-top:18px;
 }
 @media (max-width:520px) { .anos { grid-template-columns:minmax(0,1fr); } .miniaturas { grid-template-columns:repeat(4,minmax(0,1fr)); } }
 </style>
-
+<!-- Meta Pixel: cole o ID do seu pixel em PIXEL_ID (só números). Vazio = pixel desligado. -->
+<script>
+(function () {
+  var PIXEL_ID = '';
+  if (!PIXEL_ID) return;
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', PIXEL_ID);
+  fbq('track', 'PageView');
+  fbq('track', 'ViewContent', { content_name: document.title, currency: 'BRL', value: 19.90 });
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a.btn');
+    if (a) fbq('track', 'InitiateCheckout', { currency: 'BRL', value: 19.90 });
+  });
+})();
+</script>
+</head><body>
 <div class="aviso">Produto 100% digital · Você recebe o PDF no seu e-mail logo após a compra</div>
 <header><div class="w">
   <a class="logo" href="#topo" aria-label="Matemática Pronta, início">
@@ -322,5 +340,4 @@ footer .base { grid-column:1/-1; border-top:1px solid #2f3850; padding-top:18px;
   document.getElementById('prox').addEventListener('click', function () { mostrar(atual + 1); });
 })();
 </script>
-
 </body></html>
